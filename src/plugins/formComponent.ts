@@ -23,7 +23,7 @@ export default class formElement extends Vue {
   public value!: any;
 
   public render(h: CreateElement) {
-    return h(this.value.componentName || 'v-text-field', {
+    return h(this.config.componentName || 'v-text-field', {
       props: { ...this.config, value: this.value },
       attrs: this.config,
       on: {

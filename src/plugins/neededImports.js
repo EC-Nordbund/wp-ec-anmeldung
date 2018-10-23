@@ -8,7 +8,8 @@ import {
   VRangeSlider,
   VSlider,
   VCombobox,
-  VSwitch
+  VSwitch,
+  VTextarea
 } from 'vuetify/lib'
 
 export default {
@@ -21,5 +22,6 @@ export default {
   VRangeSlider,
   VSlider,
   VCombobox,
-  VSwitch
+  VSwitch,
+  VTextarea
 }

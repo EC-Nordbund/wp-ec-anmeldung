@@ -30,8 +30,6 @@
                     v-model="data[step.name][field.name]" 
                     :key="'Field' + step.name + field.name"
                   />
-                  <!-- Content -->
-                  Hier kommt der Content hin
                 </v-form>
               </v-card-text>
               <v-card-actions>
