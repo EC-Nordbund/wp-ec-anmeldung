@@ -7,14 +7,19 @@ import '@mdi/font/css/materialdesignicons.css';
 
 import { IConfig } from './config';
 import formElement from '@/plugins/formComponent';
-import geschlechtRadio from '@/components/geschlecht.vue'
+import radio from '@/components/radio'
 import datePicker from '@/components/date.vue'
+import schwimmen from "@/components/schwimmen.vue";
+import label from "@/components/label.vue";
 
 Vue.config.productionTip = false;
 
 Vue.component('ec-form-element', formElement);
-Vue.component('ec-geschlecht', geschlechtRadio)
+Vue.component('ec-radio', radio)
 Vue.component('ec-date', datePicker)
+Vue.component('ec-schwimmen', schwimmen)
+Vue.component('ec-label', label)
+
 
 const init = (
   id: string,
@@ -42,8 +47,20 @@ init('app', {
       fields: [
         {
           name: 'geschlecht',
-          label: 'Geschlecht',
-          componentName: 'ec-geschlecht'
+          label: '',
+          // label: 'Geschlecht',
+          componentName: 'ec-radio',
+          values: [
+            {
+              label: 'Männlich',
+              value: 'm'
+            },
+            {
+              label: 'Weiblich',
+              value: 'w'
+            }
+          ],
+          row: true
         },
         {
           name: 'vorname',
@@ -128,8 +145,37 @@ init('app', {
       name: 'erl',
       title: 'Erlaubnisse',
       fields: [
-        
-      ],
+        {
+          name: 'schwimen',
+          label: '_',
+          componentName: 'ec-schwimmen'
+        },
+        {
+          name: '_',
+          label: 'Mein Sohn/Meine Tochter darf...',
+          componentName: 'ec-label'
+        },
+        {
+          name: 'rad',
+          label: 'Radfahren',
+          componentName: 'v-checkbox'
+        },
+        {
+          name: 'klettern',
+          label: 'Klettern',
+          componentName: 'v-checkbox'
+        },
+        {
+          name: 'boot',
+          label: 'Boot / Kanu fahren',
+          componentName: 'v-checkbox'
+        },
+        {
+          name: 'entfernen',
+          label: 'Sich in einer Gruppe von mindestens drei Personen eine begrenzte Zeit vom Camp entfernen / in die Stadt gehen',
+          componentName: 'v-checkbox'
+        }
+      ]
     },
     {
       name: 'tnBed',
@@ -137,11 +183,13 @@ init('app', {
       fields: [
         {
           name: 'tnBedingungen',
+          required: true,
           label: 'Ich erkenne die Teilnahmebedingungen für Freizeiten an und melde mich hiermit verbindlich an. (ggf. Einverständnis des Erziehungsberechtigten)',
           componentName: 'v-checkbox'
         },
         {
           name: 'datenschutz',
+          required: true,
           label: 'Ich bin damit Einverstanden, dass die eingegeben Daten (vorerst) für bis zu 48 Stunden gespeichert werden. Ich erhalte eine E-Mail mit weiteren Informationen zum Datenschutz die ich bestätigen muss bevor die Anmeldung weiterverarbeitet wird. Nach 48 Stunden ohne Bestätigung wird die Anmeldung gelöscht.',
           componentName: 'v-checkbox'
         },

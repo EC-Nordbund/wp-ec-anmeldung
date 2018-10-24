@@ -2,13 +2,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import { IFieldConfig } from '@/config';
 import { CreateElement } from 'vue';
 
-import comps from '@/plugins/neededImports';
-
-@Component({
-  components: {
-    ...comps,
-  },
-})
+@Component({})
 export default class formElement extends Vue {
   @Prop({
     required: true,
