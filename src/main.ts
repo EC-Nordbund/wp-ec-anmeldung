@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import './plugins/vuetify.js';
-import App from './anmeldungsRoot.vue';
+import Anmeldung from './anmeldungsRoot.vue';
 // import router from './router'
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
@@ -28,7 +28,7 @@ const init = (
 ) => {
   return new Vue({
     // router: router(config),
-    render: (h) => h(App, { props: { config }, on: { sended: sendHoock } }),
+    render: (h) => h(Anmeldung, { props: { config }, on: { sended: sendHoock } }),
   }).$mount('#' + id);
 }
 ; (window as any).createAnmeldung = init;
@@ -48,7 +48,6 @@ init('app', {
         {
           name: 'geschlecht',
           label: '',
-          // label: 'Geschlecht',
           componentName: 'ec-radio',
           values: [
             {
@@ -190,7 +189,7 @@ init('app', {
         {
           name: 'datenschutz',
           required: true,
-          label: 'Ich bin damit Einverstanden, dass die eingegeben Daten (vorerst) für bis zu 48 Stunden gespeichert werden. Ich erhalte eine E-Mail mit weiteren Informationen zum Datenschutz die ich bestätigen muss bevor die Anmeldung weiterverarbeitet wird. Nach 48 Stunden ohne Bestätigung wird die Anmeldung gelöscht.',
+          label: 'Ich bin damit Einverstanden, dass die eingegeben Daten (vorerst) für bis zu 48 Stunden gespeichert werden. Während dieser Zeit hat niemand Zugriff auf diese Daten. Ich erhalte eine E-Mail mit weiteren Informationen zum Datenschutz die ich bestätigen muss bevor die Anmeldung weiterverarbeitet wird. Als Anmeldezeitpunkt für die Warteliste etc. wird der Zeitpunkt der Bestätigung angenommen. Nach 48 Stunden ohne Bestätigung wird die Anmeldung gelöscht.',
           componentName: 'v-checkbox'
         },
         {

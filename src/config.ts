@@ -24,13 +24,13 @@ export interface IConfig {
     hint?: string
     skipCheck?: (
       vConfig: IVConfig,
-      bisher: Array<{ [key: string]: string | number | boolean }>,
+      bisher: Array<{ [key: string]: string | number | boolean }>
     ) => boolean
     errorCheck?: (
       vConfig: IVConfig,
       bisher: Array<{ [key: string]: string | number | boolean }>,
-      current: { [key: string]: string | number | boolean },
+      current: { [key: string]: string | number | boolean }
     ) => true | string
-    fields: IFieldConfig[],
+    fields: IFieldConfig[]
   }>;
 }
