@@ -47,20 +47,51 @@
   </v-app>
 </template>
 <script lang="ts">
+import Vuetify from 'vuetify';
+
+Vue.use(Vuetify);
+
+import formElement from '@/components/formComponent';
+import radio from '@/components/radio'
+import datePicker from '@/components/date.vue'
+import schwimmen from "@/components/schwimmen.vue";
+import label from "@/components/label.vue";
+
+Vue.config.productionTip = false;
+
+
+Vue.component('ec-form-element', formElement);
+Vue.component('ec-radio', radio)
+Vue.component('ec-date', datePicker)
+Vue.component('ec-schwimmen', schwimmen)
+Vue.component('ec-label', label)
+
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 import { IConfig } from '@/config';
 
 @Component({})
-export default class aRoot extends Vue {
+export default class Anmeldung extends Vue {
   public e1: number = 1;
 
   public data: { [name: string]: { [name: string]: boolean | number | string } } = {};
 
-  @Prop({})
   public config!: IConfig;
 
-  @Watch('config', { immediate: true })
+  @Prop({})
+  public eventId!: number;
+
+  @Prop({})
+  public formConfig!: string;
+
+
+  @Watch('formConfig', { immediate: true })
   public onConfigChange() {
+    console.log(this.formConfig);
+
+    this.config = JSON.parse(this.formConfig);
+
+    console.log(this.config)
+    
     this.config.form.forEach((stepper) => {
       const tmp: any = {};
       stepper.fields.forEach((field) => {
