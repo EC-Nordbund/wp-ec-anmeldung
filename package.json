@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --dest lib/anmeldung",
-    "build-web": "vue-cli-service build --target wc --name ec-anmeldung 'src/Anmeldung.vue' --dest lib/anmeldung"
+    "build": "vue-cli-service build --dest lib/anmeldung"
   },
   "dependencies": {
     "@mdi/font": "^2.6.95",
