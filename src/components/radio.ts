@@ -1,27 +1,27 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
-import { CreateElement } from 'vue'
+import { CreateElement } from 'vue';
 
 @Component({})
-export default class radio extends Vue {
+export default class Radio extends Vue {
   @Prop({})
-  values!: Array<{ label: string; value: any }>
+  public values!: Array<{ label: string; value: any }>;
 
   @Prop({})
-  value!: any
+  public value!: any;
 
-  render(h: CreateElement) {
+  public render(h: CreateElement) {
     return h(
       'v-radio-group',
       {
         props: {
           ...this.$attrs,
-          value: this.value
+          value: this.value,
         },
         on: {
-          change: ($event: any) => this.$emit('input', $event)
-        }
+          change: ($event: any) => this.$emit('input', $event),
+        },
       },
-      this.values.map(v => h('v-radio', { props: v }))
-    )
+      this.values.map(v => h('v-radio', { props: v })),
+    );
   }
 }

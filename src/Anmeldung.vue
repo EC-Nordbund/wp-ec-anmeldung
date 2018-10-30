@@ -47,10 +47,6 @@
   </v-app>
 </template>
 <script lang="ts">
-import Vuetify from 'vuetify';
-
-Vue.use(Vuetify);
-
 import formElement from '@/components/formComponent';
 import radio from '@/components/radio'
 import datePicker from '@/components/date.vue'
@@ -75,21 +71,15 @@ export default class Anmeldung extends Vue {
 
   public data: { [name: string]: { [name: string]: boolean | number | string } } = {};
 
-  public config!: IConfig;
-
   @Prop({})
   public eventId!: number;
 
   @Prop({})
-  public formConfig!: string;
+  public config!: IConfig;
 
 
   @Watch('formConfig', { immediate: true })
   public onConfigChange() {
-    console.log(this.formConfig);
-
-    this.config = JSON.parse(this.formConfig);
-
     console.log(this.config)
     
     this.config.form.forEach((stepper) => {
