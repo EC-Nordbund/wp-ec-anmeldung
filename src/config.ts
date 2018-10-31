@@ -1,36 +1,44 @@
-interface IVConfig {
-  veranstaltungsID: number;
-  bezeichnung: string;
-  begin: Date;
-  ende?: Date;
+interface Event {
+  eventID: number;
+  title: string;
+  start: Date;
+  end?: Date;
 }
 
-export interface IFieldConfig {
-  label: string;
+export interface Step {
   name: string;
-  rules?: Array<(val: boolean | string | number) => true | string>;
-  required?: boolean;
-  componentName?: string;
-  counter?: number;
-  disabeled?: boolean;
-  [name: string]: any;
+  title: string;
+  hint?: string;
+  conditions?: Conditions;
+  fields: Field[];
 }
 
-export interface IConfig {
-  vConfig: IVConfig;
-  form: Array<{
-    name: string
-    title: string
-    hint?: string
-    skipCheck?: (
-      vConfig: IVConfig,
-      bisher: Array<{ [key: string]: string | number | boolean }>
-    ) => boolean
-    errorCheck?: (
-      vConfig: IVConfig,
-      bisher: Array<{ [key: string]: string | number | boolean }>,
-      current: { [key: string]: string | number | boolean }
-    ) => true | string
-    fields: IFieldConfig[]
-  }>;
+export interface Field {
+  name: string;
+  label: string;
+  rules?: Array<(val: boolean | string | number) => boolean | string>;
+  required?: boolean;
+  component?: string;
+  lenght?: number;
+  disabeled?: boolean;
+  [key: string]: any;
+}
+
+export interface Conditions {
+  skip?: (
+    event: Event,
+    previous: Array<{ [key: string]: string | number | boolean }>,
+  ) => boolean;
+  error?: (
+    event: Event,
+    previous: Array<{ [key: string]: string | number | boolean }>,
+    current: { [key: string]: string | number | boolean },
+  ) => boolean | string;
+}
+
+export interface Form {
+  event: Event;
+  start?: Date;
+  end?: Date;
+  steps: Step[];
 }

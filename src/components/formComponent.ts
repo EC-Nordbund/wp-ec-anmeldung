@@ -1,5 +1,5 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { IFieldConfig } from '@/config';
+import { Field } from '@/config';
 import { CreateElement } from 'vue';
 
 @Component({})
@@ -8,7 +8,7 @@ export default class formElement extends Vue {
     required: true,
     type: Object,
   })
-  public config!: IFieldConfig;
+  public field!: Field;
 
   @Prop({
     default: '',
@@ -17,9 +17,9 @@ export default class formElement extends Vue {
   public value!: any;
 
   public render(h: CreateElement) {
-    return h(this.config.componentName || 'v-text-field', {
-      props: { ...this.config, value: this.value },
-      attrs: this.config,
+    return h(this.field.component || 'v-text-field', {
+      props: { ...this.field, value: this.value },
+      attrs: this.field,
       on: {
         input: ($event: any) => this.$emit('input', $event),
       },

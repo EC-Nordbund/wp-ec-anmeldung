@@ -3,16 +3,16 @@
     <v-toolbar color="primary">
       <v-spacer/>
         <h1 color="white">
-          Anmeldung zu Veranstaltung: {{config.vConfig.bezeichnung}}
+          Anmeldung zu Veranstaltung: {{form.event.titel}}
         </h1>
       <v-spacer/>
     </v-toolbar>
     <v-content>
       <v-stepper v-model="e1">
         <v-stepper-header>
-          <template v-for="(step, ind) in config.form">
-            <v-divider v-if="ind !== 0" :key="'d' + ind"/>
-            <v-stepper-step  :complete="e1 > ind+1" :step="ind+1" :key="'s' + ind">
+          <template v-for="(step, index) in form.steps">
+            <v-divider v-if="index !== 0" :key="'d' + index"/>
+            <v-stepper-step  :complete="e1 > index+1" :step="index+1" :key="'s' + index">
               {{step.title}}
               <small>{{step.hint}}</small>
             </v-stepper-step>
@@ -20,13 +20,13 @@
         </v-stepper-header>
 
         <v-stepper-items>
-          <v-stepper-content v-for="(step, ind) in config.form" :key="'c'+ind" :step="ind + 1">
+          <v-stepper-content v-for="(step, index) in form.steps" :key="'c'+index" :step="index + 1">
             <v-card>
               <v-card-text>
                 <v-form>
                   <ec-form-element 
                     v-for="field in step.fields" 
-                    :config="field" 
+                    :field="field" 
                     v-model="data[step.name][field.name]" 
                     :key="'Field' + step.name + field.name"
                   />
@@ -63,7 +63,7 @@ Vue.component('ec-schwimmen', schwimmen)
 Vue.component('ec-label', label)
 
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
-import { IConfig } from '@/config';
+import { Form } from '@/config';
 
 @Component({})
 export default class Anmeldung extends Vue {
@@ -72,17 +72,17 @@ export default class Anmeldung extends Vue {
   public data: { [name: string]: { [name: string]: boolean | number | string } } = {};
 
   @Prop({})
-  public eventId!: number;
+  public eventID!: number;
 
   @Prop({})
-  public config!: IConfig;
+  public form!: Form;
 
 
-  @Watch('formConfig', { immediate: true })
+  @Watch('config', { immediate: true })
   public onConfigChange() {
-    console.log(this.config)
+    console.log(this.form)
     
-    this.config.form.forEach((stepper) => {
+    this.form.steps.forEach((stepper) => {
       const tmp: any = {};
       stepper.fields.forEach((field) => {
         tmp[field.name] = '';
