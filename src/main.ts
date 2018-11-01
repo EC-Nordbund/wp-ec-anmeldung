@@ -9,16 +9,16 @@ import { Form } from './config';
 import formElement from '@/components/formComponent';
 import radio from '@/components/radio';
 import datePicker from '@/components/date.vue';
-import schwimmen from "@/components/schwimmen.vue";
-import label from "@/components/label.vue";
+import schwimmen from '@/components/schwimmen.vue';
+import label from '@/components/label.vue';
 
 Vue.config.productionTip = false;
 
 Vue.component('ec-form-element', formElement);
-Vue.component('ec-radio', radio)
-Vue.component('ec-date', datePicker)
-Vue.component('ec-schwimmen', schwimmen)
-Vue.component('ec-label', label)
+Vue.component('ec-radio', radio);
+Vue.component('ec-date', datePicker);
+Vue.component('ec-schwimmen', schwimmen);
+Vue.component('ec-label', label);
 
 
 const init = (
@@ -30,8 +30,8 @@ const init = (
     // router: router(config),
     render: (h) => h(Anmeldung, { props: { form }, on: { sended: sendHoock } }),
   }).$mount('#' + id);
-}
-; (window as any).createAnmeldung = init;
+};
+(window as any).createAnmeldung = init;
 
 start();
 

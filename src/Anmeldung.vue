@@ -1,5 +1,6 @@
 <template>
   <v-app>
+
     <v-toolbar color="primary">
       <v-spacer/>
         <h1 color="white">
@@ -7,8 +8,10 @@
         </h1>
       <v-spacer/>
     </v-toolbar>
+
     <v-content>
       <v-stepper v-model="e1">
+
         <v-stepper-header>
           <template v-for="(step, index) in form.steps">
             <v-divider v-if="index !== 0" :key="'d' + index"/>
@@ -40,12 +43,15 @@
               </v-card-actions>
             </v-card>
           </v-stepper-content>
-
         </v-stepper-items>
+
       </v-stepper>
     </v-content>
+
   </v-app>
 </template>
+
+
 <script lang="ts">
 import formElement from '@/components/formComponent';
 import radio from '@/components/radio'
@@ -54,7 +60,6 @@ import schwimmen from "@/components/schwimmen.vue";
 import label from "@/components/label.vue";
 
 Vue.config.productionTip = false;
-
 
 Vue.component('ec-form-element', formElement);
 Vue.component('ec-radio', radio)
@@ -80,15 +85,18 @@ export default class Anmeldung extends Vue {
 
   @Watch('config', { immediate: true })
   public onConfigChange() {
-    console.log(this.form)
+    console.log('vorher:', this.data)
     
-    this.form.steps.forEach((stepper) => {
+    this.form.steps.forEach((step) => {
       const tmp: any = {};
-      stepper.fields.forEach((field) => {
+      step.fields.forEach((field) => {
         tmp[field.name] = '';
       });
-      this.data[stepper.name] = tmp;
+      this.data[step.name] = tmp;
     });
+
+    console.log('nacher:', this.data);
+
   }
 }
 </script>
