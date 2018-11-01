@@ -8,11 +8,11 @@
       <v-spacer/>
     </v-toolbar>
     <v-content>
-      <v-stepper v-model="e1">
+      <v-stepper v-model="currentStep">
         <v-stepper-header>
           <template v-for="(step, index) in form.steps">
             <v-divider v-if="index !== 0" :key="'d' + index"/>
-            <v-stepper-step  :complete="e1 > index+1" :step="index+1" :key="'s' + index">
+            <v-stepper-step  :complete="currentStep > index+1" :step="index+1" :key="'s' + index">
               {{step.title}}
               <small>{{step.hint}}</small>
             </v-stepper-step>
@@ -34,8 +34,8 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer/>
-                <v-btn @click="e1--">Zurück</v-btn>
-                <v-btn @click="e1++">Weiter</v-btn>
+                <v-btn @click="currentStep--">Zurück</v-btn>
+                <v-btn @click="currentStep++">Weiter</v-btn>
                 <v-btn>Absenden</v-btn>
               </v-card-actions>
             </v-card>
@@ -67,7 +67,7 @@ import { Form } from '@/config';
 
 @Component({})
 export default class Anmeldung extends Vue {
-  public e1: number = 1;
+  public currentStep: number = 1;
 
   public data: { [name: string]: { [name: string]: boolean | number | string } } = {};
 
