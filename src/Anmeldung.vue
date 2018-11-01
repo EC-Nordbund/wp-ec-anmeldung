@@ -53,6 +53,7 @@
 
 
 <script lang="ts">
+import Axios from 'axios';
 import formElement from '@/components/formComponent';
 import radio from '@/components/radio'
 import datePicker from '@/components/date.vue'
@@ -78,6 +79,18 @@ export default class Anmeldung extends Vue {
 
   public printData() {
     console.log(this.data);
+    this.submitData();
+  }
+
+  public submitData() {
+    Axios
+      .post('https://www.ec-nordbund.de/wp-json/ec-api/v1/anmeldung', this.data)
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 
   @Prop({})
