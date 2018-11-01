@@ -5,7 +5,7 @@ import Anmeldung from './Anmeldung.vue';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
 
-import { Form } from './config';
+import { Form, Event } from './config';
 import formElement from '@/components/formComponent';
 import radio from '@/components/radio';
 import datePicker from '@/components/date.vue';
@@ -23,12 +23,13 @@ Vue.component('ec-label', label);
 
 const init = (
   id: string,
+  event: Event,
   form: Form,
   sendHoock: (data: Array<{ [key: string]: string | number | boolean }>) => void,
 ) => {
   return new Vue({
     // router: router(config),
-    render: (h) => h(Anmeldung, { props: { form }, on: { sended: sendHoock } }),
+    render: (h) => h(Anmeldung, { props: { form, event }, on: { sended: sendHoock } }),
   }).$mount('#' + id);
 };
 (window as any).createAnmeldung = init;
@@ -37,11 +38,11 @@ start();
 
 function start() {
   return init('app', {
-    event: {
-      eventID: 1,
-      title: 'Test',
-      start: new Date(),
-    },
+    id: 1,
+    title: 'Test',
+    start: new Date(),
+  },
+  {
     steps: [
       {
         name: 'pers',
@@ -148,7 +149,7 @@ function start() {
         fields: [
           {
             name: 'schwimen',
-            label: '_',
+            label: 'Schwimmen',
             component: 'ec-schwimmen',
           },
           {

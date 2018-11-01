@@ -4,7 +4,7 @@
     <v-toolbar color="primary">
       <v-spacer/>
         <h1 color="white">
-          Anmeldung zu Veranstaltung: {{form.event.titel}}
+          Anmeldung zu Veranstaltung: {{event.title}}
         </h1>
       <v-spacer/>
     </v-toolbar>
@@ -69,7 +69,7 @@ Vue.component('ec-schwimmen', schwimmen)
 Vue.component('ec-label', label)
 
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
-import { Form } from '@/config';
+import { Form, Event } from '@/config';
 
 @Component({})
 export default class Anmeldung extends Vue {
@@ -78,13 +78,22 @@ export default class Anmeldung extends Vue {
   public data: { [name: string]: boolean | number | string } = {};
 
   public printData() {
-    console.log(this.data);
+    //console.log(this.data);
     this.submitData();
   }
 
   public submitData() {
+    const json = JSON.stringify({
+      eventID: this.event.id,
+      data: this.data
+    });
+
     Axios
-      .post('https://www.ec-nordbund.de/wp-json/ec-api/v1/anmeldung', this.data)
+      .post('https://www.ec-nordbund.de/wp-json/ec-api/v1/anmeldung', json, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
       .then(response => {
         console.log(response.data);
       })
@@ -93,14 +102,20 @@ export default class Anmeldung extends Vue {
       });
   }
 
-  @Prop({})
-  public eventID!: number;
+  @Prop({
+    required: true,
+  })
+  public event!: Event;
 
-  @Prop({})
+  @Prop({
+    required: true,
+  })
   public form!: Form;
 
   @Watch('config', { immediate: true })
   public onConfigChange() {
+
+    // set init values    
     this.form.steps.forEach((step) => {
       step.fields.forEach((field) => {
         this.data[field.name] = '';
