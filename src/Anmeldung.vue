@@ -30,8 +30,8 @@
                   <ec-form-element 
                     v-for="field in step.fields" 
                     :field="field" 
-                    v-model="data[step.name][field.name]" 
-                    :key="'Field' + step.name + field.name"
+                    v-model="data[field.name]" 
+                    :key="'field' + step.name + field.name"
                   />
                 </v-form>
               </v-card-text>
@@ -74,7 +74,7 @@ import { Form } from '@/config';
 export default class Anmeldung extends Vue {
   public e1: number = 1;
 
-  public data: { [name: string]: { [name: string]: boolean | number | string } } = {};
+  public data: { [name: string]: boolean | number | string } = {};
 
   @Prop({})
   public eventID!: number;
@@ -82,21 +82,13 @@ export default class Anmeldung extends Vue {
   @Prop({})
   public form!: Form;
 
-
   @Watch('config', { immediate: true })
   public onConfigChange() {
-    console.log('vorher:', this.data)
-    
     this.form.steps.forEach((step) => {
-      const tmp: any = {};
       step.fields.forEach((field) => {
-        tmp[field.name] = '';
+        this.data[field.name] = '';
       });
-      this.data[step.name] = tmp;
     });
-
-    console.log('nacher:', this.data);
-
   }
 }
 </script>
