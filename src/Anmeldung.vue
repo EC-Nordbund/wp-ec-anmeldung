@@ -86,7 +86,9 @@ export default class Anmeldung extends Vue {
   public onConfigChange() {
     this.form.steps.forEach((step) => {
       step.fields.forEach((field) => {
-        this.data[field.name] = '';
+        if(field.name.length > 0) {
+          this.data[field.name] = '';
+        }
       });
     });
   }

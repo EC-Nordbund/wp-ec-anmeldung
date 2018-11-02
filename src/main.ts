@@ -53,11 +53,11 @@ function start() {
             component: 'ec-radio',
             values: [
               {
-                label: 'Männlich',
+                label: 'männlich',
                 value: 'm',
               },
               {
-                label: 'Weiblich',
+                label: 'weiblich',
                 value: 'w',
               },
             ],
@@ -147,14 +147,14 @@ function start() {
         title: 'Erlaubnisse',
         fields: [
           {
-            name: 'schwimen',
-            label: '_',
-            component: 'ec-schwimmen',
+            name: '',
+            label: 'Mein Sohn/Meine Tochter darf:',
+            component: 'ec-label',
           },
           {
-            name: '_',
-            label: 'Mein Sohn/Meine Tochter darf...',
-            component: 'ec-label',
+            name: 'schwimmen',
+            label: 'Schwimmen',
+            component: 'v-checkbox',
           },
           {
             name: 'rad',
