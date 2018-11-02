@@ -13,12 +13,26 @@ function eca_api_form_submission() {
 }
 
 function eca_handle_registration( WP_REST_Request $request) {
+    $response = new stdClass(); // json: {}
+
     $params = $request->get_json_params();
 
-    $response = new stdClass(); // json: {}
-    
-    if( isset($params['eventID']) && isset($params['data']) ) {        
-        $response = eca_add_registration($params['eventID'], $params['data']);
+    if(isset($params['data']) && isset($params['eventID'])) {
+        $data = $params['data'];
+
+        $error = array();
+
+        if(empty($data['email'])) {
+            $error['email'] = 'E-Mail is a required field and was empty.';
+        }
+            
+        if(empty($error)) {
+            $email_to = $data['email'];
+
+            $response = eca_add_registration($params['eventID'], $params['data']);
+        } else {        
+            $response = array('error' => $error);
+        }
     }
 
     return $response;

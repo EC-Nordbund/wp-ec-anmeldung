@@ -78,7 +78,7 @@ function start() {
             name: 'gebDat',
             label: 'Geburtsdatum',
             component: 'ec-date',
-          }
+          },
         ],
       },
       {
