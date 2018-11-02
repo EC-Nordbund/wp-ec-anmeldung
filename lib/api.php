@@ -37,7 +37,7 @@ function eca_handle_registration( WP_REST_Request $request) {
         
         // Add registration to database
         if(empty($error)) {
-            $db_access = eca_add_registration($event_id, $data);
+            $db_access = eca_add_registration($event_id, $data, 'sdasds');
 
             // Add errors
             if(isset($db_access['error'])) {
@@ -48,13 +48,13 @@ function eca_handle_registration( WP_REST_Request $request) {
         }
 
         if(empty($error)) {
-            $email_status = eca_confirmation_mail($email_to, $event_id, $data);
+            $mailer_responce = eca_confirmation_mail($email_to, $event_id, $data);
 
             // Add errors
-            if(isset($email_status['error'])) {
-                $error['confirmation_mail'] = $email_status['error'];
+            if(isset($mailer_responce['error'])) {
+                $error['confirmation_mail'] = $mailer_responce['error'];
             } else {
-                $response['confirmation_mail'] = array('sended' => $email_status);
+                $response['confirmation_mail'] =  $mailer_responce;
             }
         }
 

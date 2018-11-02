@@ -18,6 +18,7 @@ function eca_registration_setup_db()
 
     $sql = "CREATE TABLE " . $anmelde_table . " (
         anmelde_id mediumint(9) NOT NULL AUTO_INCREMENT,
+        token text NOT NULL,
         created_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
         expire_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
         event_id mediumint(9) DEFAULT -1 NOT NULL,
@@ -72,37 +73,47 @@ function eca_registration_delete_cron_job()
 /**
  * Adds a registration to database and schedule autodeletation when registraion is expired (after 24h)
  */
-function eca_add_registration($event_id, $data)
+function eca_add_registration($event_id, $data, $token)
 {
     global $wpdb;
 
     $wpdb->hide_errors();
 
-    $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
+    $error = array();
 
-    $timestamp = date_create_immutable_from_format('Y-m-d H:i:s', current_time('mysql'));
-    $expiration = $timestamp->add(new DateInterval('PT24H')); // 24h later as timestamp (current time)
+    if(empty($token)) {
+        $error['token'] = 'token missing';
+    } else {
+        $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
 
-    $insert = $wpdb->insert(
-        $anmelde_table,
-        array(
-            'created_at' => $timestamp->format('Y-m-d H:i:s'),
-            'expire_at' => $expiration->format('Y-m-d H:i:s'),
-            'event_id' => $event_id,
-            'data_as_json' => json_encode($data)
-        )
-    );
+        $timestamp = date_create_immutable_from_format('Y-m-d H:i:s', current_time('mysql'));
+        $expiration = $timestamp->add(new DateInterval('PT24H')); // 24h later as timestamp (current time)
+
+        $insert = $wpdb->insert(
+            $anmelde_table,
+            array(
+                'token' => $token,
+                'created_at' => $timestamp->format('Y-m-d H:i:s'),
+                'expire_at' => $expiration->format('Y-m-d H:i:s'),
+                'event_id' => $event_id,
+                'data_as_json' => json_encode($data)
+            )
+        );
+    }
 
     $result = array();
 
     // If an error occours during insertation
     if(!$insert) {
-        $error = $wpdb->print_error();
-        $result['error'] =  $error;        
-    } else {
+        $error['request'] = $wpdb->print_error();
+    }
+    
+    if(empty($error)) {
         $result['new_cron_job_created'] = eca_registration_create_cron_job();
         $result['registration_id'] = $wpdb->insert_id;
         $result['entry_expires_at'] = $expiration->getTimestamp();
+    } else {
+        $result = array('error' => $error); 
     }
 
     return $result;
