@@ -18,9 +18,10 @@ function eca_handle_registration( WP_REST_Request $request) {
 
     $params = $request->get_json_params();
 
-    if(isset($params['data']) && isset($params['eventID'])) {
+    if(isset($params['schema']) && isset($params['data']) && isset($params['eventID'])) {
         $event_id = $params['eventID'];
         $data = $params['data'];
+        $schema = $params['schema'];
 
         $error = array();
 
