@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('ABSPATH')) exit;
+
 function eca_anmeldung_shortcode($atts) {
     
     // set attributes with specified defaults

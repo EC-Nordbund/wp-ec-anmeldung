@@ -4,7 +4,7 @@
     <v-toolbar color="primary">
       <v-spacer/>
         <h1 color="white">
-          Anmeldung zu Veranstaltung: {{form.event.titel}}
+          Anmeldung zu Veranstaltung: {{event.title}}
         </h1>
       <v-spacer/>
     </v-toolbar>
@@ -39,7 +39,7 @@
                 <v-spacer/>
                 <v-btn @click="e1--">Zurück</v-btn>
                 <v-btn @click="e1++">Weiter</v-btn>
-                <v-btn>Absenden</v-btn>
+                <v-btn @click="printData()">Absenden</v-btn>
               </v-card-actions>
             </v-card>
           </v-stepper-content>
@@ -53,6 +53,7 @@
 
 
 <script lang="ts">
+import Axios from 'axios';
 import formElement from '@/components/formComponent';
 import radio from '@/components/radio'
 import datePicker from '@/components/date.vue'
@@ -68,7 +69,7 @@ Vue.component('ec-schwimmen', schwimmen)
 Vue.component('ec-label', label)
 
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
-import { Form } from '@/config';
+import { Form, Event } from '@/config';
 
 @Component({})
 export default class Anmeldung extends Vue {
@@ -76,14 +77,45 @@ export default class Anmeldung extends Vue {
 
   public data: { [name: string]: boolean | number | string } = {};
 
-  @Prop({})
-  public eventID!: number;
+  public printData() {
+    //console.log(this.data);
+    this.submitData();
+  }
 
-  @Prop({})
+  public submitData() {
+    const json = JSON.stringify({
+      eventID: this.event.id,
+      data: this.data
+    });
+
+    Axios
+      .post('https://www.ec-nordbund.de/wp-json/ec-api/v1/anmeldung', json, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  @Prop({
+    required: true,
+  })
+  public event!: Event;
+
+  @Prop({
+    required: true,
+  })
   public form!: Form;
 
   @Watch('config', { immediate: true })
   public onConfigChange() {
+
+    // set init values    
     this.form.steps.forEach((step) => {
       step.fields.forEach((field) => {
         if(field.name.length > 0) {

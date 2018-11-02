@@ -46,8 +46,10 @@ add_filter( 'cron_schedules', 'example_add_cron_interval' );
  */
 function eca_registration_create_cron_job()
 {
+    $next_full_hour = ceil(time()/3600) * 3600;
+
     if (!wp_next_scheduled('eca_delete_expired_registration')) {
-        wp_schedule_event(time(), 'five_seconds', 'eca_delete_expired_registration');
+        wp_schedule_event($next_full_hour, 'hourly', 'eca_delete_expired_registration');
 
         return true;
     }
@@ -70,7 +72,7 @@ function eca_registration_delete_cron_job()
 /**
  * Adds a registration to database and schedule autodeletation when registraion is expired (after 24h)
  */
-function eca_add_registration($data)
+function eca_add_registration($event_id, $data)
 {
     global $wpdb;
 
@@ -78,26 +80,32 @@ function eca_add_registration($data)
 
     $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
 
-    // Test
-    $data['event_id'] = 5;
-
-    // TODO: define the json object
-    $json = $data['data'];
-
     $timestamp = date_create_immutable_from_format('Y-m-d H:i:s', current_time('mysql'));
-    $expiration = $timestamp->add(new DateInterval('PT1M')); // 24h later as timestamp (current time)
+    $expiration = $timestamp->add(new DateInterval('PT24H')); // 24h later as timestamp (current time)
 
-    $wpdb->insert(
+    $insert = $wpdb->insert(
         $anmelde_table,
         array(
             'created_at' => $timestamp->format('Y-m-d H:i:s'),
             'expire_at' => $expiration->format('Y-m-d H:i:s'),
-            'event_id' => $data['event_id'],
-            'data_as_json' => json_encode($json)
+            'event_id' => $event_id,
+            'data_as_json' => json_encode($data)
         )
     );
 
-    return $expiration;
+    $result = array();
+
+    // If an error occours during insertation
+    if(!$insert) {
+        $error = $wpdb->print_error();
+        $result['error'] =  $error;        
+    } else {
+        $result['new_cron_job_created'] = eca_registration_create_cron_job();
+        $result['registration_id'] = $wpdb->insert_id;
+        $result['expires_at'] = $expiration->getTimestamp();
+    }
+
+    return $result;
 }
 
 
