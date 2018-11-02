@@ -102,7 +102,7 @@ function eca_add_registration($event_id, $data)
     } else {
         $result['new_cron_job_created'] = eca_registration_create_cron_job();
         $result['registration_id'] = $wpdb->insert_id;
-        $result['expires_at'] = $expiration->getTimestamp();
+        $result['entry_expires_at'] = $expiration->getTimestamp();
     }
 
     return $result;

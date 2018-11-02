@@ -20,6 +20,8 @@ define('ECA_PLUGIN_DIR', untrailingslashit(dirname(ECA_PLUGIN)));
 require_once ECA_PLUGIN_DIR . '/lib/database.php';
 require_once ECA_PLUGIN_DIR . '/lib/shortcode.php';
 require_once ECA_PLUGIN_DIR . '/lib/api.php';
+require_once ECA_PLUGIN_DIR . '/lib/mail.php';
+
 
 // Add API endpoints
 add_action('rest_api_init', 'eca_api_form_submission');
