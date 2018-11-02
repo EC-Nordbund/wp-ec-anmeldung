@@ -75,7 +75,7 @@ import { Form, Event } from '@/config';
 export default class Anmeldung extends Vue {
   public e1: number = 1;
 
-  public data: { [name: string]: boolean | number | string } = {};
+  public data: { [name: string]: { [name: string]: boolean | number | string } }= {};
 
   public printData() {
     //console.log(this.data);
@@ -117,9 +117,10 @@ export default class Anmeldung extends Vue {
 
     // set init values    
     this.form.steps.forEach((step) => {
+      this.data[step.name] = {};
       step.fields.forEach((field) => {
         if(field.name.length > 0) {
-          this.data[field.name] = '';
+          this.data[step.name][field.name] = '';
         }
       });
     });

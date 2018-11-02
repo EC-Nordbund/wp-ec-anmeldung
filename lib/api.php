@@ -24,8 +24,14 @@ function eca_handle_registration( WP_REST_Request $request) {
 
         $error = array();
 
-        if(empty($data['email'])) {
-            $error['email'] = 'E-Mail is a required field and was empty.';
+        $email_to = eca_get_value_of_key_r('email', $data);
+
+        if(!isset($email_to)) {
+            $error['email'] = 'E-Mail field is required but missing.';
+        }
+
+        if(empty($error) && empty($email_to)) {
+            $error['email'] = 'E-Mail field is empty.';
         }
         
         // Add registration to database
@@ -41,8 +47,6 @@ function eca_handle_registration( WP_REST_Request $request) {
         }
 
         if(empty($error)) {
-            $email_to = $data['email'];
-
             $email_status = eca_confirmation_mail($email_to, $event_id, $data);
 
             // Add errors
@@ -59,4 +63,18 @@ function eca_handle_registration( WP_REST_Request $request) {
     }
 
     return $response;
+}
+
+function eca_get_value_of_key_r($key, $array) {
+    if(array_key_exists($key, $array)) return $array[$key];
+
+    $result = null;
+
+    foreach ($array as $subarray) {
+        if(is_array($subarray)) {
+            $result = eca_get_value_of_key_r($key, $subarray);
+        }
+        if(isset($result)) return $result;  // found key
+    }
+    return $result; // key not in array
 }
