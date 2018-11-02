@@ -45,7 +45,7 @@ function start() {
   {
     steps: [
       {
-        name: 'pers',
+        name: 'person',
         title: 'Persöhnliche Daten',
         fields: [
           {
@@ -118,18 +118,18 @@ function start() {
         ],
       },
       {
-        name: 'bem',
-        title: 'Bemerkungen',
+        name: 'sonstiges',
+        title: 'Sonstiges',
         fields: [
           {
-            name: 'vegetarisch',
-            label: 'Ich bin Vegetarier!',
-            component: 'v-checkbox',
+            name: '',
+            label: 'Verplegung:',
+            component: 'ec-label',
           },
           {
-            name: 'bemerkungen',
-            label: 'Bemerkungen',
-            component: 'v-textarea',
+            name: 'vegetarisch',
+            label: 'vegetarisch',
+            component: 'v-checkbox',
           },
           {
             name: 'lebensmittel',
@@ -138,13 +138,13 @@ function start() {
           },
           {
             name: 'gesundheitsinformationen',
-            label: 'Gesundheitsinformationen (was gibt es zu beachten, Krankheiten etc.)',
+            label: 'Gesundheitsinformationen (z.b. Allergien, Krankheiten etc.)',
             component: 'v-textarea',
           }
         ]
       },
       {
-        name: 'erl',
+        name: 'permissions',
         title: 'Erlaubnisse',
         fields: [
           {
@@ -180,23 +180,23 @@ function start() {
         ],
       },
       {
-        name: 'tnBed',
+        name: 'agreements',
         title: 'Datenschutz & Teilnahmebedingungen',
         fields: [
           {
-            name: 'tnBedingungen',
+            name: 'agrees_teilnehmer_bedingung',
             required: true,
             label: 'Ich erkenne die Teilnahmebedingungen für Freizeiten an und melde mich hiermit verbindlich an. (ggf. Einverständnis des Erziehungsberechtigten)',
             component: 'v-checkbox',
           },
           {
-            name: 'datenschutz',
+            name: 'agrees_datenschutz',
             required: true,
             label: 'Ich bin damit Einverstanden, dass die eingegeben Daten (vorerst) für bis zu 48 Stunden gespeichert werden. Während dieser Zeit hat niemand Zugriff auf diese Daten. Ich erhalte eine E-Mail mit weiteren Informationen zum Datenschutz die ich bestätigen muss bevor die Anmeldung weiterverarbeitet wird. Als Anmeldezeitpunkt für die Warteliste etc. wird der Zeitpunkt der Bestätigung angenommen. Nach 48 Stunden ohne Bestätigung wird die Anmeldung gelöscht.',
             component: 'v-checkbox',
           },
           {
-            name: 'fahrgemeinschaften',
+            name: 'agrees_fahrgemeinschaften',
             label: 'Hiermit willige ich ein, dass meine Anschrift zum Zweck der Bildung von Fahrgemeinschaften bei der Organisation der An- und/oder Abreise an die anderen Teilnehmer der Reisegruppe weitergegeben werden darf. Die Erteilung der Einwilligung ist freiwillig.',
             component: 'v-checkbox',
           },

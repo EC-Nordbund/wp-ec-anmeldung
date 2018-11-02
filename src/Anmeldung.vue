@@ -75,7 +75,8 @@ import { Form, Event } from '@/config';
 export default class Anmeldung extends Vue {
   public e1: number = 1;
 
-  public data: { [name: string]: { [name: string]: boolean | number | string } }= {};
+  public schema: { [name:string]: Array<string> } = {}
+  public data: { [name: string]: boolean | number | string } = {};
 
   public printData() {
     //console.log(this.data);
@@ -85,7 +86,8 @@ export default class Anmeldung extends Vue {
   public submitData() {
     const json = JSON.stringify({
       eventID: this.event.id,
-      data: this.data
+      data: this.data,
+      schema: this.schema
     });
 
     Axios
@@ -117,10 +119,10 @@ export default class Anmeldung extends Vue {
 
     // set init values    
     this.form.steps.forEach((step) => {
-      this.data[step.name] = {};
+      this.schema[step.name] = step.fields.map((f) => f.name);
       step.fields.forEach((field) => {
         if(field.name.length > 0) {
-          this.data[step.name][field.name] = '';
+          this.data[field.name] = '';
         }
       });
     });
