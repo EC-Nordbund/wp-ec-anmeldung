@@ -39,7 +39,7 @@
                 <v-spacer/>
                 <v-btn @click="e1--">Zurück</v-btn>
                 <v-btn @click="e1++">Weiter</v-btn>
-                <v-btn>Absenden</v-btn>
+                <v-btn @click="printData()">Absenden</v-btn>
               </v-card-actions>
             </v-card>
           </v-stepper-content>
@@ -73,6 +73,10 @@ import { Form } from '@/config';
 @Component({})
 export default class Anmeldung extends Vue {
   public e1: number = 1;
+
+  public printData() {
+    console.log(this.data);
+  }
 
   public data: { [name: string]: boolean | number | string } = {};
 
