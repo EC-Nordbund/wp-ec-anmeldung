@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('ABSPATH')) exit;
+
 function eca_confirmation_mail($to = '', $event_id = -1, $data = array(), $schema = array()) {
 
     $error = $responce = array();
@@ -8,6 +10,8 @@ function eca_confirmation_mail($to = '', $event_id = -1, $data = array(), $schem
     // $headers[] = 'Bcc: webmaster@ec-nordbund.de';
     $headers[] = 'Reply-To: Referent <referent@ec-nordbund.de>';
     $headers[] = 'Content-Type: text/html';
+
+    $subject = 'Bestätige dein Anmeldung';
 
     $to = eca_mail_to_wrapper($to, $data);
 
@@ -18,11 +22,16 @@ function eca_confirmation_mail($to = '', $event_id = -1, $data = array(), $schem
     }
 
     if(empty($error)) {
-        $message = eca_get_confirmation_mail_template($data, $schema, $event);
+        $message = eca_generate_confirmation_mail(array(
+            'vorname' => empty($data['vorname']) ? '' : $data['vorname'],
+            'subheader' => 'Deine Anmeldung ist noch nicht abgeschlossen!',
+            'event_title' => $event['title'],
+            'data_table' => json_encode($data)
+        ), $data, $schema);
 
-        // $message = json_encode($message);   // only for DEV purpose
+        // $message = json_encode($matches);   // only for DEV purpose
 
-        $mailed = wp_mail($to, 'Test', $message , $headers);
+        $mailed = wp_mail($to, $subject, $message , $headers);
 
         if($mailed) {
             $responce['mailed'] = $mailed;
@@ -69,38 +78,32 @@ function eca_mail_to_wrapper($to, $data) {
     return $to;
 }
 
-function eca_get_confirmation_mail_template($data, $schema, $event) {
-    $template = file_get_contents( ECA_PLUGIN_DIR . '/lib/assets/confirmation_mail.html');
+function eca_generate_confirmation_mail($replacements, $data, $schema) {
+    $template = eca_get_mail_template('mail_header');
+    $template .= eca_get_mail_template('mail_subheader');
+    $template .= eca_get_mail_template('confirmation/message');
+    $template .= eca_get_mail_template('confirmation/data-overview');
+    $template .= eca_get_mail_template('mail_datenschutzerklärung');
+    $template .= eca_get_mail_template('mail_footer');
 
-    $regex = "/\*\|(.*?)\|\*/";
-    preg_match_all($regex, $template, $matches);
+    $mail = eca_mail_replace_placeholder($template, $replacements, $data, $schema);
+
+    return $mail;
+}
+
+function eca_get_mail_template($path, $type = 'html') {
+    return file_get_contents(ECA_PLUGIN_DIR . '/lib/templates/' . $path . '.' . $type);
+}
+
+function eca_mail_replace_placeholder($template, $replacements, $data, $schema) {
+    preg_match_all("/\*\|(.*?)\|\*/", $template, $matches);
 
     for($i=0; $i < count($matches[1]); $i++) {
         $match = $matches[1][$i];
         
-        $replace = eca_mail_get_replacements($match, $data, $schema, $event);
+        $replace = empty($replacements[$match]) ? '@@@' : $replacements[$match];
         $template = str_replace($matches[0][$i], $replace, $template);
     }
 
     return $template;
-}
-
-function eca_mail_get_replacements($match, $data, $schema, $event) {
-    switch ($match) {
-        case 'anrede':
-            if(!empty($data['vorname'])) {
-                return 'Moin ' . $data['vorname'];
-            } else {
-                return 'Moin Moin,';
-            }
-            break;
-
-        case 'event_title':
-            return $event['title'];
-            break;
-        
-        default:
-            return '@';
-            break;
-    }
 }
