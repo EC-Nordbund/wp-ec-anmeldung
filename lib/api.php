@@ -48,7 +48,7 @@ function eca_handle_registration( WP_REST_Request $request) {
         }
 
         if(empty($error)) {
-            $mailer_responce = eca_confirmation_mail($email_to, $event_id, $data);
+            $mailer_responce = eca_confirmation_mail($email_to, $event_id, $data, $schema);
 
             // Add errors
             if(isset($mailer_responce['error'])) {

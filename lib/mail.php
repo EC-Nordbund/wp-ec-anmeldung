@@ -26,7 +26,7 @@ function eca_confirmation_mail($to = '', $event_id = -1, $data = array(), $schem
             'vorname' => empty($data['vorname']) ? '' : $data['vorname'],
             'subheader' => 'Deine Anmeldung ist noch nicht abgeschlossen!',
             'event_title' => $event['title'],
-            'data_table' => json_encode($data)
+            'data_table' => eca_mail_generate_data_overview($data, $schema)
         ), $data, $schema);
 
         // $message = json_encode($matches);   // only for DEV purpose
@@ -106,4 +106,60 @@ function eca_mail_replace_placeholder($template, $replacements, $data, $schema) 
     }
 
     return $template;
+}
+
+function eca_mail_generate_data_overview($data, $schema) {
+    $table = '<div class="">';
+
+    // $table .= json_encode($schema);
+    // $table .= json_encode($data);
+
+    foreach ($schema as $step => $fields) {
+        
+        $no_data = array_map(function ($f) {
+            return empty($data[$f]);
+        }, $fields);
+
+        if(in_array(true, $no_data)) { 
+
+            $th = $td = '';
+
+            foreach ($fields as $field) {            
+                if(!empty($field) && !empty($data[$field])) {
+                    $th .= '<td valign="middle" style="border: 1px solid #999; text-align: center; padding: 6px 12px;">';
+                        $th .= '<div style="color:#555555;font-family:\'Ubuntu\', Tahoma, Verdana, Segoe, sans-serif;"><i>' . $field . '</i></div></dh>';
+                    $td .= '<td valign="middle" style="border: 1px solid #999; text-align: center; padding: 6px 12px;">';
+                        $td .= '<div style="color:#555555;font-family:\'Ubuntu\', Tahoma, Verdana, Segoe, sans-serif;"><p>' . $data[$field] . '</p></div></td>';
+                } 
+            }
+            
+            $table .= '<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;"><![endif]-->';
+            $table .= '<div style="color:#555555;font-family:\'Ubuntu\', Tahoma, Verdana, Segoe, sans-serif;line-height:120%; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">';
+            $table .= '<div style="font-size:12px;line-height:14px;color:#555555;font-family:\'Ubuntu\', Tahoma, Verdana, Segoe, sans-serif;text-align:left;"><p style="margin: 0; line-height: 22px; font-size: 18px;">';
+
+            $table .= $step; // Abschnit header
+
+            $table .= '</p></div></div>';
+            $table .= '<!--[if mso]></td></tr></table><![endif]-->';
+
+            $table .= '<div style="padding: 10px;"><div style="overflow-x:auto;">';
+            $table .= '<table cellpadding="2" cellspacing="2" width="100%" style="border-collapse: collapse; border: 1px solid #999;">';
+            $table .= '<tr>';
+
+            $table .= $th;
+
+            $table .= '</tr>';
+            $table .= '<tr>';
+
+            $table .= $td;
+        
+            $table .= '</tr>';
+            $table .= '</table>';
+            $table .= '</div></div>';
+        }
+    }
+
+    $table .= '</div>';
+
+    return $table;
 }
