@@ -21,4 +21,4 @@ Template Name: Landingpage
         </div><!--content id END-->
     </div><!--layer_wrapper class END-->
 
-<?php get_footer(); ?>
+<?php get_footer('landingpage'); ?>
