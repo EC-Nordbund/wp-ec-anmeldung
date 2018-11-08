@@ -22,7 +22,11 @@ function eca_api_form_submission() {
             )
         )
     ));
-}
+    register_rest_route('ec-api/v1', '/anmeldungen', array(
+        'methods' => 'GET',
+        'callback' => 'eca_registrations_stats'
+    ));
+    }
 
 function eca_handle_registration( WP_REST_Request $request) {
     $response = new stdClass(); // json: {}
@@ -166,4 +170,17 @@ function eca_registration_prepare_to_send() {
 
     // TODO: JSON decode & validate/sort data
 
+}
+
+function eca_registrations_stats() {
+    $total = eca_registration_count();
+    $waiting = eca_registration_count('status', 'waiting_for_confirmation');
+    $expired = eca_registration_count('status', 'expired');
+
+    return array(
+        'total' => $total,
+        'status' => array(
+            'waiting' => $waiting,
+            'expired' => $expired
+        ));
 }
