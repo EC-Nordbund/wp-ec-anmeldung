@@ -122,19 +122,17 @@ export default class Anmeldung extends Vue {
     this.form.steps.forEach((step) => {
       this.schema[step.name] = step.fields.map((f) => f.name);
       step.fields.forEach((field) => {
-        if(field.name.length > 0) {
-          switch (field.type) {
-            case 'boolean':
-              this.data[field.name] = false;              
-              break;
+        switch (field.type) {
+          case 'boolean':
+            this.data[field.name] = false;              
+            break;
 
-            case 'string':
-              this.data[field.name] = '';
-              break;
-          
-            default:
-              break;
-          }
+          case 'string':
+            this.data[field.name] = '';
+            break;
+        
+          default:
+            break;
         }
       });
     });
