@@ -10,19 +10,15 @@
     </v-toolbar>
 
     <v-content>
-      <v-stepper v-model="currentStep">
-        <v-stepper-header>
+      <v-stepper v-model="currentStep" vertical non-linear>
           <template v-for="(step, index) in form.steps">
-            <v-divider v-if="index !== 0" :key="'d' + index"/>
-            <v-stepper-step  :complete="currentStep > index+1" :step="index+1" :key="'s' + index">
+
+            <v-stepper-step  :step="index+1" :key="'s' + index" editable>
               {{step.title}}
               <small>{{step.hint}}</small>
             </v-stepper-step>
-          </template>
-        </v-stepper-header>
 
-        <v-stepper-items>
-          <v-stepper-content v-for="(step, index) in form.steps" :key="'c'+index" :step="index + 1">
+          <v-stepper-content :key="'c'+index" :step="index + 1">
             <v-card>
               <v-card-text>
                 <v-form>
@@ -36,14 +32,13 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer/>
-                <v-btn @click="currentStep--">Zurück</v-btn>
-                <v-btn @click="currentStep++">Weiter</v-btn>
-                <v-btn @click="printData()">Absenden</v-btn>
+                <v-btn v-if="currentStep < form.steps.length" @click="currentStep++">Weiter</v-btn>
+                <v-btn v-else @click="printData()">Absenden</v-btn>
               </v-card-actions>
             </v-card>
           </v-stepper-content>
-        </v-stepper-items>
-
+        
+        </template>
       </v-stepper>
     </v-content>
 

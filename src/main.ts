@@ -131,16 +131,14 @@ function start() {
         title: 'Sonstiges',
         fields: [
           {
-            name: '',
-            label: 'Verplegung:',
-            type: 'none',
-            component: 'ec-label',
-          },
-          {
             name: 'vegetarisch',
-            label: 'vegetarisch',
+            label: 'Verplegung:',
             type: 'boolean',
-            component: 'ec-checkbox',
+            component: 'v-select',
+            items: [
+              { text: 'normal', value: false, },
+              { text: 'vegetarisch', value: true, }
+            ],
           },
           {
             name: 'lebensmittel',
