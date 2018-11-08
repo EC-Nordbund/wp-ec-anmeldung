@@ -2,7 +2,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-function eca_confirmation_mail($to = '', $event_id = -1, $data = array(), $schema = array()) {
+function eca_confirmation_mail($to = '', $event_id = -1, $token = 'no_token', $data = array(), $schema = array()) {
 
     $error = $responce = array();
 
@@ -26,7 +26,8 @@ function eca_confirmation_mail($to = '', $event_id = -1, $data = array(), $schem
             'vorname' => empty($data['vorname']) ? '' : $data['vorname'],
             'subheader' => 'Deine Anmeldung ist noch nicht abgeschlossen!',
             'event_title' => $event['title'],
-            'data_table' => eca_mail_generate_data_overview($data, $schema)
+            'data_table' => eca_mail_generate_data_overview($data, $schema),
+            'token' => $token
         ), $data, $schema);
 
         // $message = json_encode($matches);   // only for DEV purpose

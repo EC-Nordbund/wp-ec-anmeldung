@@ -19,10 +19,13 @@ $optimizer = optimizer_option_defaults();
 <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no"/>
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
 <style>
+    * {
+        box-sizing: border-box; 
+    }
+
     body {
         margin: 0;
         background-color: #2b2b2b;
-
         font-family: 'Cantarell', sans-serif;
         font-size: 16px;
         font-weight: 400;
@@ -34,32 +37,52 @@ $optimizer = optimizer_option_defaults();
     }
 
     #header {
-      position: absolute;
-      top: 0;
-      width: 100%;
-      background-color: #8fb217;
-      text-align: center;
-      padding: 20px 0;
-      z-index: 999;
+        padding: 3vh;
+        background-color: #8fb217;
+        text-align: center;
+        height: 14vh;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.6);
     }
-    
-    #content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
 
+    #header img {
+        height: 8vh;
+    }
+
+    #content {
+        padding: 2em;
+        min-height: 58vh;
+    }
+
+    #message {
+        margin: 0 auto;
+        max-width: calc(480px + 20vw);
+        background: #eeeeee;
+        color: #333333;
+        padding: 1em;
+        border-radius: 0.3em;
+        box-shadow: 2px 8px 24px 0px rgba(0,0,0, 0.2)
+    }
+
+    #message h1 {
+        font-size: 24px;
+        color: #8fb217;
+    }
+
+    #message p {
+        line-height: 1em;
+    }
+
+    #message a {
+        color: #d0044d;
     }
 
     #footer {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        padding: 12px 0;
+        height: 28vh;
         background-color: #333333;
         text-align: center;
         color: #999999;
         font-size: 14px;
+        padding: 1em;
     }
 
     #footer-links ul {
@@ -68,7 +91,7 @@ $optimizer = optimizer_option_defaults();
 
     #footer-links ul li {
         margin: 0 12px;
-        padding: 4px;
+        padding: 2vh;
         display: inline-block;
     }
 
@@ -77,15 +100,25 @@ $optimizer = optimizer_option_defaults();
             padding: 10px;
             display: block;
         }
+
+        #content {
+            padding: 1em;
+        }
+
         .social .social_bookmarks a {
-            padding: 16px 32px !important;
+            padding: 2vh 32px !important;
+        }
+
+        #footer {
+            height: unset;
+            padding-bottom: 8vh;
         }
     }
 
     .social .social_bookmarks a {
         font-size: 24px;
         display: inline-block;
-        padding: 2px 8px;
+        padding: 2vh 8px;
         text-align: center;
         opacity: 0.6;
         -webkit-border-radius: 3px;
@@ -99,7 +132,48 @@ $optimizer = optimizer_option_defaults();
     }
     
     .copyright {
-        padding-top: 32px;
+        padding-top: 1vh;
+    }
+
+    #loader {
+        border: 6px solid #111;
+        border-radius: 50%;
+        border-top: 6px solid #8fb217;
+        margin: 4em auto;
+        width: 48px;
+        height: 48px;
+        -webkit-animation: spin 1s linear infinite; /* Safari */
+        animation: spin 1s linear infinite;
+    }
+
+        /* Safari */
+    @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Add animation to "page content" */
+    .animate-bottom {
+        position: relative;
+        -webkit-animation-name: animatebottom;
+        -webkit-animation-duration: 0.5s;
+        animation-name: animatebottom;
+        animation-duration: 0.5s
+    }
+
+    @-webkit-keyframes animatebottom {
+        from { bottom:-100px; opacity:0 } 
+        to { bottom:0px; opacity:1 }
+    }
+
+    @keyframes animatebottom { 
+        from{ bottom:-100px; opacity:0 } 
+        to{ bottom:0; opacity:1 }
     }
 </style>
 </head>
