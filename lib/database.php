@@ -198,3 +198,19 @@ function eca_delete_expired_registration() {
 
     return $wpdb->query("UPDATE `SNAdK_eca_anmeldung` SET `data_as_json` = '{}', `status` = 'expired' WHERE `expire_at` <= CURRENT_TIME AND `status` = 'waiting_for_confirmation' ");
 }
+
+
+function eca_registration_count($where_col = '', $where_val = '', $operator = '=') {
+    global $wpdb;
+
+    $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
+
+    if(empty($where_col)) {
+        return $wpdb->get_var("SELECT COUNT(*) FROM $anmelde_table");
+    }
+
+    return $wpdb->get_var(
+            "SELECT COUNT(*) FROM $anmelde_table WHERE `$where_col` $operator '$where_val'"
+    );
+
+}
