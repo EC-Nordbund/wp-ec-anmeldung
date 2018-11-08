@@ -4,7 +4,7 @@
     <v-toolbar color="primary">
       <v-spacer/>
         <h1 color="white">
-          Anmeldung zu Veranstaltung: {{form.event.titel}}
+          Anmeldung zu Veranstaltung: {{event.title}}
         </h1>
       <v-spacer/>
     </v-toolbar>
@@ -53,6 +53,7 @@
 
 
 <script lang="ts">
+import Axios from 'axios';
 import formElement from '@/components/formComponent';
 import radio from '@/components/radio'
 import datePicker from '@/components/date.vue'
@@ -68,27 +69,64 @@ Vue.component('ec-schwimmen', schwimmen)
 Vue.component('ec-label', label)
 
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
-import { Form } from '@/config';
+import { Form, Event } from '@/config';
 
 @Component({})
 export default class Anmeldung extends Vue {
   public e1: number = 1;
 
+<<<<<<< HEAD
   public printData() {
     console.log(this.data);
   }
 
+=======
+  public schema: { [name:string]: Array<string> } = {}
+>>>>>>> dev
   public data: { [name: string]: boolean | number | string } = {};
 
-  @Prop({})
-  public eventID!: number;
+  public printData() {
+    //console.log(this.data);
+    this.submitData();
+  }
 
-  @Prop({})
+  public submitData() {
+    const json = JSON.stringify({
+      eventID: this.event.id,
+      data: this.data,
+      schema: this.schema
+    });
+
+    Axios
+      .post('https://www.ec-nordbund.de/wp-json/ec-api/v1/anmeldung', json, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  @Prop({
+    required: true,
+  })
+  public event!: Event;
+
+  @Prop({
+    required: true,
+  })
   public form!: Form;
 
   @Watch('config', { immediate: true })
   public onConfigChange() {
+
+    // set init values    
     this.form.steps.forEach((step) => {
+      this.schema[step.name] = step.fields.map((f) => f.name);
       step.fields.forEach((field) => {
         if(field.name.length > 0) {
           this.data[field.name] = '';

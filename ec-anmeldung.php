@@ -19,10 +19,17 @@ define('ECA_PLUGIN_DIR', untrailingslashit(dirname(ECA_PLUGIN)));
 // Some includes & requirements
 require_once ECA_PLUGIN_DIR . '/lib/database.php';
 require_once ECA_PLUGIN_DIR . '/lib/shortcode.php';
+require_once ECA_PLUGIN_DIR . '/lib/api.php';
+require_once ECA_PLUGIN_DIR . '/lib/mail.php';
+require_once ECA_PLUGIN_DIR . '/lib/landing-page.php';
 
+$eca = new ECA_LandingPage();
+
+// Add API endpoints
+add_action('rest_api_init', 'eca_api_form_submission');
 
 // Register scripts and styles
-add_action( 'wp_enqueue_scripts', 'eca_register_scripts_and_styles');
+add_action('wp_enqueue_scripts', 'eca_register_scripts_and_styles');
 
 // Declare action to delete all expired registration data in database
 add_action('eca_delete_expired_registration', 'eca_delete_expired_registration');
