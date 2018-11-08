@@ -1,25 +1,31 @@
 <template>
-  <v-dialog
-    ref="dialog"
-    v-model="dialog_open"
-    persistent
+  <v-menu
+    ref="menu"
+    :close-on-content-click="false"
+    v-model="menu"
+    :nudge-right="40"
+    transition="scale-transition"
+    offset-y
     lazy
     full-width
-    width="290px"
+    min-width="290px"
   >
     <v-text-field
       slot="activator"
       readonly
-      :value="german"
+      v-model="german"
       prepend-icon="mdi-event"
       v-bind="$attrs"
     />
-    <v-date-picker v-model="date_input" scrollable locale="de-de">
-      <v-spacer></v-spacer>
-      <v-btn flat color="primary" @click="dialog_open = false">Abbrechen</v-btn>
-      <v-btn color="primary" @click="onDateChange(date_input);$refs.dialog.save(date_input)">Speichern</v-btn>
+    <v-date-picker
+    v-model="date"
+    ref="picker"
+    :max="new Date().toISOString().substr(0, 10)"
+    min="1950-01-01"
+    @change="save"
+    locale="de-de">
     </v-date-picker>
-  </v-dialog>
+  </v-menu>
 </template>
 
 <script lang="ts">
@@ -33,8 +39,8 @@ import {
 
 @Component({})
 export default class DatePicker extends Vue {
-  dialog_open: boolean = false;
-  date_input: string = '';
+  menu: boolean = false;
+  date: string | null = null;
 
   inheritAttrs = false;
 
@@ -45,24 +51,35 @@ export default class DatePicker extends Vue {
   })
   value!: string;
 
+  @Watch('menu')
+  onDialogOpenChange(val: boolean) {
+    return val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'));
+  }
+
+
   @Watch('value', { immediate: true })
-  onValueChange(value: string) {
-    this.date_input = value;
+  @Emit()
+  save(value: string) {
+    this.date = value;
   }
 
   @Watch('date')
   @Emit('input')
-  onDateChange(val: string) {}
+  onDateChange(val: string) {
+    if(val.length > 0) {
+      this.menu = false
+    }
+  }
 
   get german(): string {
     if (
-      this.date_input === '' ||
-      this.date_input === null ||
-      this.date_input === undefined
+      this.date === '' ||
+      this.date === null ||
+      this.date === undefined
     ) {
       return '';
     } else {
-      return this.date_input
+      return this.date
         .split('-')
         .reverse()
         .join('.');
