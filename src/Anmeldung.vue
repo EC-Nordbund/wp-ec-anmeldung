@@ -30,7 +30,7 @@
                   <ec-form-element 
                     v-for="field in step.fields" 
                     :field="field" 
-                    v-model="data[field.name]" 
+                    :v-model="data[field.name]" 
                     :key="'field' + step.name + field.name"
                   />
                 </v-form>
@@ -59,6 +59,7 @@ import radio from '@/components/radio'
 import datePicker from '@/components/date.vue'
 import schwimmen from "@/components/schwimmen.vue";
 import label from "@/components/label.vue";
+import checkbox from "@/components/checkbox";
 
 Vue.config.productionTip = false;
 
@@ -67,6 +68,7 @@ Vue.component('ec-radio', radio)
 Vue.component('ec-date', datePicker)
 Vue.component('ec-schwimmen', schwimmen)
 Vue.component('ec-label', label)
+Vue.component('ec-checkbox', checkbox)
 
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 import { Form, Event } from '@/config';
@@ -75,19 +77,12 @@ import { Form, Event } from '@/config';
 export default class Anmeldung extends Vue {
   public e1: number = 1;
 
-<<<<<<< HEAD
-  public printData() {
-    console.log(this.data);
-  }
-
-=======
   public schema: { [name:string]: Array<string> } = {}
->>>>>>> dev
   public data: { [name: string]: boolean | number | string } = {};
 
   public printData() {
-    //console.log(this.data);
-    this.submitData();
+    console.log(this.data);
+    //this.submitData();
   }
 
   public submitData() {
@@ -129,7 +124,19 @@ export default class Anmeldung extends Vue {
       this.schema[step.name] = step.fields.map((f) => f.name);
       step.fields.forEach((field) => {
         if(field.name.length > 0) {
-          this.data[field.name] = '';
+          switch (field.type) {
+            case 'boolean':
+              this.data[field.name] = false;              
+              break;
+
+            case 'string':
+              this.data[field.name] = '';
+              break;
+          
+            default:
+              break;
+          }
+          
         }
       });
     });
