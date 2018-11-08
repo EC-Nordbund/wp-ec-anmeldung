@@ -30,7 +30,7 @@
                   <ec-form-element 
                     v-for="field in step.fields" 
                     :field="field" 
-                    :v-model="data[field.name]" 
+                    v-model="data[field.name]" 
                     :key="'field' + step.name + field.name"
                   />
                 </v-form>
@@ -136,7 +136,6 @@ export default class Anmeldung extends Vue {
             default:
               break;
           }
-          
         }
       });
     });
