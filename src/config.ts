@@ -1,5 +1,5 @@
-interface Event {
-  eventID: number;
+export interface Event {
+  id: number;
   title: string;
   start: Date;
   end?: Date;
@@ -37,7 +37,6 @@ export interface Conditions {
 }
 
 export interface Form {
-  event: Event;
   start?: Date;
   end?: Date;
   steps: Step[];

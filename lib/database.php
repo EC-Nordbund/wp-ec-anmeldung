@@ -18,10 +18,12 @@ function eca_registration_setup_db()
 
     $sql = "CREATE TABLE " . $anmelde_table . " (
         anmelde_id mediumint(9) NOT NULL AUTO_INCREMENT,
+        token text NOT NULL,
         created_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
         expire_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
         event_id mediumint(9) DEFAULT -1 NOT NULL,
         data_as_json text DEFAULT '' NOT NULL,
+        status text DEFAULT '' NOT NULL,
         PRIMARY KEY  (anmelde_id)
     ) " . $charset_collate . ";";
 
@@ -46,8 +48,10 @@ add_filter( 'cron_schedules', 'example_add_cron_interval' );
  */
 function eca_registration_create_cron_job()
 {
+    $next_full_hour = ceil(time()/3600) * 3600;
+
     if (!wp_next_scheduled('eca_delete_expired_registration')) {
-        wp_schedule_event(time(), 'five_seconds', 'eca_delete_expired_registration');
+        wp_schedule_event($next_full_hour, 'hourly', 'eca_delete_expired_registration');
 
         return true;
     }
@@ -70,45 +74,131 @@ function eca_registration_delete_cron_job()
 /**
  * Adds a registration to database and schedule autodeletation when registraion is expired (after 24h)
  */
-function eca_add_registration($data)
+function eca_add_registration($event_id, $data, $token)
 {
     global $wpdb;
 
     $wpdb->hide_errors();
 
+    $error = array();
+
+    if(empty($token)) {
+        $error['token'] = 'token missing';
+    } else {
+        $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
+
+        $timestamp = date_create_immutable_from_format('Y-m-d H:i:s', current_time('mysql'));
+        $expiration = $timestamp->add(new DateInterval('PT48H')); // 48h later as timestamp (current time)
+
+        $insert = $wpdb->insert(
+            $anmelde_table,
+            array(
+                'token' => $token,
+                'created_at' => $timestamp->format('Y-m-d H:i:s'),
+                'expire_at' => $expiration->format('Y-m-d H:i:s'),
+                'event_id' => $event_id,
+                'status' => 'waiting_for_confirmation',
+                'data_as_json' => json_encode($data)
+            )
+        );
+    }
+
+    $result = array();
+
+    // If an error occours during insertation
+    if(!$insert) {
+        $error['request'] = $wpdb->print_error();
+    }
+    
+    if(empty($error)) {
+        $result['new_cron_job_created'] = eca_registration_create_cron_job();
+        $result['registration_id'] = $wpdb->insert_id;
+        $result['entry_expires_at'] = $expiration->getTimestamp();
+    } else {
+        $result = array('error' => $error); 
+    }
+
+    return $result;
+}
+
+function eca_select_registration($token = '') {
+    global $wpdb;
+
     $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
 
-    // Test
-    $data['event_id'] = 5;
+    $registration = array();
 
-    // TODO: define the json object
-    $json = $data['data'];
+    if(!empty($token)) {
+        $registration = $wpdb->get_row("SELECT * FROM $anmelde_table WHERE `token` = '$token' AND `expire_at` > CURRENT_TIME ", ARRAY_A);
 
-    $timestamp = date_create_immutable_from_format('Y-m-d H:i:s', current_time('mysql'));
-    $expiration = $timestamp->add(new DateInterval('PT1M')); // 24h later as timestamp (current time)
+        if(!empty($registration)) {
+            return $registration;
+        }
+    }
 
-    $wpdb->insert(
-        $anmelde_table,
-        array(
-            'created_at' => $timestamp->format('Y-m-d H:i:s'),
-            'expire_at' => $expiration->format('Y-m-d H:i:s'),
-            'event_id' => $data['event_id'],
-            'data_as_json' => json_encode($json)
-        )
-    );
-
-    return $expiration;
+    return eca_select_registration_status($token);
 }
+
+function eca_select_registration_status($token = '') {
+    global $wpdb;
+
+    $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
+
+    if(!empty($token)) {
+        $status = $wpdb->get_results("SELECT status FROM $anmelde_table WHERE token = '$token'", ARRAY_A);
+        
+        if(!empty($status)) {
+            return $status[0];
+        }
+    }
+    
+    return array('status' => 'not_found');
+}
+
+function eca_update_registration_status($token = '', $status = '') {
+    global $wpdb;
+
+    $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
+
+    if( !empty($token) && !empty($status) ) {
+            $wpdb->update(
+                $anmelde_table,
+                array('status' => $status),
+                array('token' => $token),
+                '%s',
+                '%s'
+            );
+    }
+}
+
+function eca_registration_delay_expiration($token) {
+    global $wpdb;
+
+    $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
+
+    if(!empty($token)) {
+        $timestamp = date_create_immutable_from_format('Y-m-d H:i:s', current_time('mysql'));
+        $expiration = $timestamp->add(new DateInterval('PT48H')); // 48h later as timestamp (current time)
+
+        $wpdb->update(
+            $anmelde_table,
+            array('expire_at' => $expiration->format('Y-m-d H:i:s')),
+            array('token' => $token),
+            '%s',
+            '%s'
+        );
+    }
+}
+
 
 
 /**
  * Deletes all expired registration in database when called
  */
-function eca_delete_expired_registration()
-{
+function eca_delete_expired_registration() {
     global $wpdb;
 
     $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
 
-    $wpdb->query("DELETE FROM $anmelde_table WHERE expire_at <= CURRENT_TIME ;");
+    return $wpdb->query("UPDATE `SNAdK_eca_anmeldung` SET `data_as_json` = '{}', `status` = 'expired' WHERE `expire_at` <= CURRENT_TIME AND `status` = 'waiting_for_confirmation' ");
 }
