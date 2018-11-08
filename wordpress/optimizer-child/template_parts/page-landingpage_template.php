@@ -9,8 +9,8 @@ Template Name: Landingpage
 <?php get_header('landingpage'); ?>
 
 <div id="content">
-    <div id="loader"></div>
-    <div id="message" class="animate-bottom" style="display: none;">
+    <div id="message">
+        <?php echo $eca->handle_request($_GET); ?>
     </div>
     
     <script>
@@ -24,72 +24,6 @@ Template Name: Landingpage
 
     </script>
 
-    <?php echo $eca->handle_request($_GET); ?>
-    
-    <script>
-    const loader = document.getElementById('loader');
-    const message = document.getElementById('message');
-
-    function generateMessage(title, body) {
-        message.innerHTML = ''; //reset
-
-        var header = document.createElement("h1");
-        var htext = document.createTextNode(title);
-        
-        header.appendChild(htext);
-        message.appendChild(header);
-
-        if(title.length > 0 && body.length > 0) {
-            const hr = document.createElement("hr");
-            message.appendChild(hr);
-        }
-
-        message.innerHTML = message.innerHTML + body;
-    }
-
-    function showMessage() {
-        loader.style.display = "none";
-        message.style.display = "inherit";
-    }
-    
-    if(token.length > 0 ) {
-        generateMessage(default_title, default_body);
-
-        var reload_counter = 0;
-
-        var request = new XMLHttpRequest();
-        request.open('GET', base_url + token, true);
-
-        request.onload = function() {
-            if (request.status >= 200 && request.status < 400) {
-                var data = JSON.parse(request.responseText);
-            
-                console.log(data);
-
-                if('status' in data && 'message' in data) {
-
-                    // if title and body exists for given status
-                    if(data.message.title !== ''  && data.message.body !== '') {
-                        generateMessage(data.message.title, data.message.body);
-                    } else {
-                        generateMessage('Unbekannter Status: ' + data.status, default_body);
-                    }
-                }
-            } else {
-                generateMessage('API-Abfrage gescheitert', default_body);
-            }
-            showMessage();
-        };
-
-        request.send();
-
-    } else {
-        message.classList.remove("animate-bottom");
-        generateMessage('Dieser Link funktioniert leider nicht.', '');
-
-        showMessage();
-    }
-    </script>
 </div>
 
 <?php get_footer('landingpage'); ?>

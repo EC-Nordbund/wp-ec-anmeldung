@@ -47,6 +47,13 @@ function eca_handle_registration( WP_REST_Request $request) {
         if(empty($error) && empty($email_to)) {
             $error['email'] = 'E-Mail field is empty.';
         }
+
+        if(empty($error)) {
+            $token = hash(
+                'sha256',
+                json_encode($data)
+            );
+        }
         
         // Add registration to database
         if(empty($error)) {
@@ -87,12 +94,11 @@ function eca_registration_status( WP_REST_Request $request) {
     $token = $params['token'];
 
     $response = eca_select_registration_status($token);
-    $response['message'] = eca_get_message_by_status($response['status']);
 
     return $response;
 }
 
-function eca_get_message_by_status($status) {
+function eca_get_message_by_status($status, $token = 'no_token') {
     $title = '';
     $body = '';
 
@@ -115,6 +121,14 @@ function eca_get_message_by_status($status) {
             break;
 
         default:
+            $title = 'Anfrage konnte nicht verarbeitet werden.';
+            $body = '<p>Ooops, das tut uns Leid.</p>';
+            $body .= '<p>Bitte sende uns eine E-Mail an <a href="mailto:webmaster@ec-nordbund.de?';
+            $body .= 'subject=Fehler%20beim%20Best%C3%A4tigen%20der%20Anmeldung&';
+            $body .= 'body=%0A%0A%0A%0A%3D%3D%3D%20Fehlerdetails%20%3D%3D%3D%0Atoken%3A%20' . $token;
+            $body .= '%0Astatus%3A%20' . $status . '%0A%0A%0A">';
+            $body .= 'webmaster@ec-nordbund.de</a>';
+            $body .= ' damit wir die Fehlerursache so schnell wie möglich untersuchen können.</p>';
             break;
     }
 
@@ -137,15 +151,19 @@ function eca_get_value_of_key_r($key, $array) {
 
 function eca_registration_send_to_server($event_id, $data) {
 
-    //TODO: update status
+    // depending in response:
+        // TODO: delay expiration
+        // TODO: update status in DB
 
-    return 0;
+    // TODO: return status as string)
+
+    return 'test';
 }
 
 function eca_registration_prepare_to_send() {
 
     // TODO: map event IDs
 
-    // JSON decode & validate/sort data
+    // TODO: JSON decode & validate/sort data
 
 }

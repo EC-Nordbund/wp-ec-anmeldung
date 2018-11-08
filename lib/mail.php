@@ -11,7 +11,7 @@ function eca_confirmation_mail($to = '', $event_id = -1, $token = 'no_token', $d
     $headers[] = 'Reply-To: Referent <referent@ec-nordbund.de>';
     $headers[] = 'Content-Type: text/html';
 
-    $subject = 'Bestätige dein Anmeldung';
+    $subject = 'Bestätige deine Anmeldung';
 
     $to = eca_mail_to_wrapper($to, $data);
 

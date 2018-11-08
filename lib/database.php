@@ -130,9 +130,13 @@ function eca_select_registration($token = '') {
 
     if(!empty($token)) {
         $registration = $wpdb->get_row("SELECT * FROM $anmelde_table WHERE `token` = '$token' AND `expire_at` > CURRENT_TIME ", ARRAY_A);
+
+        if(!empty($registration)) {
+            return $registration;
+        }
     }
 
-    return $registration;
+    return eca_select_registration_status($token);
 }
 
 function eca_select_registration_status($token = '') {

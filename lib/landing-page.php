@@ -10,29 +10,49 @@ class ECA_LandingPage {
 
         $token = $params['t'];
 
-        $registration = array();
+        $message = array();
 
         if(!empty($token)) {
             $registration = eca_select_registration($token);
 
-            if(!empty($registration)) {
-               
-                eca_registration_send_to_server(
+            // return $registration;
+
+            $status = $registration['status'];
+
+            if($status === 'waiting_for_confirmation') {
+                $status = eca_registration_send_to_server(
                     $registration['event_id'],
                     json_decode($registration['data_as_json'])
                 );
             }
-        
-            return $this->script_prameters($token);
+
+            $message = eca_get_message_by_status($status, $token);
+            
+            return $this->print_message($message['title'], $message['body']);
         }
 
-        return '<!-- TOKEN MISSING -->';
+        return $this->print_message('Dieser Link ist ungültig');
     }
 
     private function script_prameters($token = '') {
         $html = '<script>';
         $html .= 'token = "' . $token . '";';
         $html .= '</script>';
+
+        return $html;
+    }
+
+    private function print_message($title, $message = '') {
+        $html = '';
+
+        if(!empty($title)) {
+            $html .= '<h1>' . $title . '</h1>';
+        }
+
+        if(!empty($message)) {
+            $html .= '<hr/>';
+            $html .= $message;
+        }
 
         return $html;
     }
