@@ -100,42 +100,6 @@ function eca_registration_status( WP_REST_Request $request) {
     return $response;
 }
 
-function eca_get_message_by_status($status, $token = 'no_token') {
-    $title = '';
-    $body = '';
-
-    switch ($status) {
-        case 'waiting_for_confirmation':
-            $title = 'Deine Anmeldung kann zur Zeit nicht entgegengenommen werden.';
-            $body = '<p>Bitte versuche es zu einem späteren Zeitpunk nochmal.</p>';
-            break;
-
-        case 'not_found':
-            $title = 'Keine Daten mit diesem Link gefunden';
-            $body = '<p>Überprüfe ob der Link mit der aus der Bestätigungs-E-Mail übereinstimmt.</p>';
-            break;
-        
-        case 'expired':
-            $title = 'Deine Anmeldedaten sind nicht mehr gültig.';
-            $body .= '<p>Nachdem du das Anmeldeformular abgesendet hast, speichern wir deine Daten für 48 Stunden und senden dir eine E-Mail zu, in der du deine Anmeldung bestätigen und damit unserer Datenschutzerklärung zustimmen kannst.</p>';
-            $body .= '<p>Erst dann ist deinen Anmeldung bei uns eingegangen und gültig.</p>';
-            $body .= '<p><strong>Bitte, melde dich erneut bei der von dir ausgewählten Veranstaltung an und wiederhole den Prozess.</strong></p>';
-            break;
-
-        default:
-            $title = 'Anfrage konnte nicht verarbeitet werden.';
-            $body = '<p>Ooops, das tut uns Leid.</p>';
-            $body .= '<p>Bitte sende uns eine E-Mail an <a href="mailto:webmaster@ec-nordbund.de?';
-            $body .= 'subject=Fehler%20beim%20Best%C3%A4tigen%20der%20Anmeldung&';
-            $body .= 'body=%0A%0A%0A%0A%3D%3D%3D%20Fehlerdetails%20%3D%3D%3D%0Atoken%3A%20' . $token;
-            $body .= '%0Astatus%3A%20' . $status . '%0A%0A%0A">';
-            $body .= 'webmaster@ec-nordbund.de</a>';
-            $body .= ' damit wir die Fehlerursache so schnell wie möglich untersuchen können.</p>';
-            break;
-    }
-
-    return array('title' => $title, 'body' => $body);
-}
 
 function eca_get_value_of_key_r($key, $array) {
     if(array_key_exists($key, $array)) return $array[$key];
@@ -152,22 +116,148 @@ function eca_get_value_of_key_r($key, $array) {
 }
 
 function eca_registration_send_to_server($event_id, $data) {
+    $error = array();
 
-    // depending in response:
-        // TODO: delay expiration
-        // TODO: update status in DB
+    $mutation = eca_registration_prepare_graphql_mutation($event_id, $data);
+    $query = json_encode(array('query' => $mutation));
 
-    // TODO: return status as string)
+    // return $mutation;
 
-    return 'test';
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_URL, "https://ec-api.de/graphql");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
+    curl_setopt($ch, CURLOPT_POST, TRUE);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+
+    $headers = array();
+    $headers[] = "Content-Type: application/json";
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+    $result = curl_exec($ch);
+    if (curl_errno($ch)) {
+        $error['curl'] = curl_error($ch);
+    }
+    curl_close ($ch);
+
+    $json = '';
+
+    if(empty($error)) {
+        $json = json_decode($result, true);
+    }
+
+    if(empty($json)) {
+        $error['json'] = 'Empty result.';
+    }
+
+    if(!empty($json['errors'])) {
+        $error['graphQL'] = $json['errors'];
+    }
+
+    $status = 'delayed_expiration';
+    $waiting_position = 0;
+
+    if(empty($error) && !empty($json['data']['anmelden'])) {
+        $r = $json['data']['anmelden'];
+
+        switch ($r) {
+
+            // duplicate person & event combi
+            case -2:
+                $status = 'person_already_registered';
+                break;
+            
+            // Authentifizierungsfehler
+            case -1:
+                $status = 'authentication_failed';
+                break;
+
+            // Successful
+            case 0:
+                $status = 'successful_registered';
+                break;
+
+            default:
+                if(is_int($r) && $r > 0) {
+                    $status = 'waitingqueue';
+                    $waiting_position = $r;
+                } 
+                break;
+        }
+    }
+    
+    if($status === 'waitingqueue') {
+        return array('status' => $status, 'value' => $waiting_position);
+    }
+
+    return $status;
 }
 
-function eca_registration_prepare_to_send() {
+function eca_registration_prepare_graphql_mutation($event_id, $data) {
+
+    $token = '';
+    if(defined('API_TOKEN')) {
+        $token = API_TOKEN;
+    }
+
+    $timestamp = date_create('now');
+
+    $params = array(
+        'isWP' => true,
+        'token' => $token,
+        'position' => 1,
+        'veranstaltungsID' => 4200,
+        'anmeldeZeitpunkt' => $timestamp->format('Y-m-d H:i:s'),
+        'vorname' => 'leer',
+        'nachname' => 'leer',
+        'gebDat' => $timestamp->format('Y-m-d'),
+        'geschlecht' => '',
+        'eMail' => '',
+        'telefon' => '',
+        'strasse' => '',
+        'plz' => '',
+        'ort' => '',
+        'vegetarisch' => false,
+        'lebensmittelAllergien' => '',
+        'gesundheitsinformationen' => '',
+        'bemerkungen' => '',
+        'radfahren' => false,
+        'schwimmen' => 0,
+        'fahrgemeinschaften' => false,
+        'klettern' => false,
+        'sichEntfernen' => false,
+        'bootFahren' => false,
+        'extra_json' => '{}'
+    );
+
+    $params_str = '';
+    foreach ($params as $key => $value) {
+        // string
+        if(is_string($value)) { 
+            $params_str .= $key . ': "' . $value . '", ';
+        }
+
+        // numeric
+        if(is_int($value)) { 
+            $params_str .= $key . ': ' . $value . ', ';
+        }
+
+        // boolean
+        if(is_bool($value)) {
+            $params_str .= $key . ': ' . ($value ? 'true' : 'false') . ', ';
+        }
+    }
+
+    if(!empty($params_str)) {
+        return 'mutation { anmelden( ' . substr($params_str, 0, -2) . ') }';
+    }
+
 
     // TODO: map event IDs
 
     // TODO: JSON decode & validate/sort data
-
 
     // 0 = success
     // positive zahle warteliste pos
@@ -176,4 +266,6 @@ function eca_registration_prepare_to_send() {
     // -2 = person hat sich schon mal angemendelt für veranstaltung (daten ändern: referent@ec-nordbund.de)
 
     // 4200 test veranstaltung 
+
+    return '';
 }

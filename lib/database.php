@@ -171,7 +171,7 @@ function eca_update_registration_status($token = '', $status = '') {
     }
 }
 
-function eca_registration_delay_expiration($token) {
+function eca_registration_delay_expiration($token = '') {
     global $wpdb;
 
     $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
@@ -187,7 +187,11 @@ function eca_registration_delay_expiration($token) {
             '%s',
             '%s'
         );
+
+        return $expiration->getTimestamp();
     }
+
+    return 0;
 }
 
 
