@@ -1,9 +1,7 @@
 <template>
   <v-app>
 
-    <ec-countdown v-if="countdown" :until="event.start"/>
     
-    <template v-else>
     
       <v-toolbar color="primary">
         <v-spacer/>
@@ -12,6 +10,10 @@
           </h1>
         <v-spacer/>
       </v-toolbar>
+
+      <ec-countdown v-if="countdown" :until="event.start"/>
+      
+      <template v-else>
 
       <v-content>
         <v-stepper v-model="currentStep" vertical non-linear>
