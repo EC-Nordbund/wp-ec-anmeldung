@@ -209,7 +209,7 @@ function eca_registration_prepare_graphql_mutation($event_id, $data, $created) {
     $timestamp = date_create('now');
 
     if(empty($created)) {
-        $created = $timestamp
+        $created = $timestamp;
     }
 
     // TODO: map event IDs with an array();
