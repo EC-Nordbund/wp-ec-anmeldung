@@ -2,6 +2,7 @@
 node_modules
 /dist
 /lib/anmeldung
+/lib/token.php
 
 # local env files
 .env.local

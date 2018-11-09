@@ -32,8 +32,10 @@ function eca_anmeldung_shortcode($atts) {
     $html .= "<strong>We're sorry but vue-ec-anmeldung doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>";
     $html .= "</noscript>";
 
-    $html .= "<div id=app>";
-    $html .= "</div>";
+    $html .= '<div class="anmelde-wrapper">';
+      $html .= '<div id="app">';
+      $html .= "</div>";
+    $html .= '</div>';
 
     $html .= eca_add_script_tags();
 

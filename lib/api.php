@@ -5,6 +5,8 @@ if (!defined('ABSPATH')) exit;
 require_once 'database.php';
 require_once 'mail.php';
 
+include_once 'token.php';
+
 function eca_api_form_submission() {
     register_rest_route('ec-api/v1', '/anmeldung', array(
         'methods' => 'POST',
@@ -166,4 +168,12 @@ function eca_registration_prepare_to_send() {
 
     // TODO: JSON decode & validate/sort data
 
+
+    // 0 = success
+    // positive zahle warteliste pos
+
+    // -1 = token stimmt nicht (keine berechtigung)
+    // -2 = person hat sich schon mal angemendelt für veranstaltung (daten ändern: referent@ec-nordbund.de)
+
+    // 4200 test veranstaltung 
 }
