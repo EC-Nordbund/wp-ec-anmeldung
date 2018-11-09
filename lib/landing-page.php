@@ -31,7 +31,8 @@ class ECA_LandingPage {
                 $response = eca_registration_send_to_server(
                     $token,
                     $registration['event_id'],
-                    json_decode($registration['data_as_json'], true)
+                    json_decode($registration['data_as_json'], true),
+                    $registration['created_at']
                 );
 
                 // updates status in DB

@@ -133,7 +133,10 @@ export default class Anmeldung extends Vue {
 
     // set init values    
     this.form.steps.forEach((step) => {
+
+      // TODO: extend schema (titles)
       this.schema[step.name] = step.fields.map((f) => f.name);
+
       step.fields.forEach((field) => {
         switch (field.type) {
           case 'boolean':
@@ -148,6 +151,7 @@ export default class Anmeldung extends Vue {
             break;
         }
       });
+
     });
   }
 

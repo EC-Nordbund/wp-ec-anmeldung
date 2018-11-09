@@ -115,32 +115,36 @@ function eca_get_value_of_key_r($key, $array) {
     return $result; // key not in array
 }
 
-function eca_registration_send_to_server($token, $event_id, $data) {
+function eca_registration_send_to_server($token, $event_id, $data, $created) {
     $error = array();
 
-    $mutation = eca_registration_prepare_graphql_mutation($event_id, $data);
-    $query = json_encode(array('query' => $mutation));
+    // TODO: check for required fields
 
-    // return $mutation;
 
-    $ch = curl_init();
+    if(empty($error)) {
+        $mutation = eca_registration_prepare_graphql_mutation($event_id, $data, $created);
+        $query = json_encode(array('query' => $mutation));
 
-    curl_setopt($ch, CURLOPT_URL, "https://ec-api.de/graphql");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
-    curl_setopt($ch, CURLOPT_POST, TRUE);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        $ch = curl_init();
 
-    $headers = array();
-    $headers[] = "Content-Type: application/json";
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_URL, "https://ec-api.de/graphql");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 
-    $result = curl_exec($ch);
-    if (curl_errno($ch)) {
-        $error['curl'] = curl_error($ch);
+        $headers = array();
+        $headers[] = "Content-Type: application/json";
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        $result = curl_exec($ch);
+        if (curl_errno($ch)) {
+            $error['curl'] = curl_error($ch);
+        }
+        curl_close ($ch);
     }
-    curl_close ($ch);
+
 
     $json = '';
 
@@ -195,7 +199,7 @@ function eca_registration_send_to_server($token, $event_id, $data) {
     return array('status' => $status, 'value' => $value);
 }
 
-function eca_registration_prepare_graphql_mutation($event_id, $data) {
+function eca_registration_prepare_graphql_mutation($event_id, $data, $created) {
 
     $token = '';
     if(defined('API_TOKEN')) {
@@ -204,12 +208,21 @@ function eca_registration_prepare_graphql_mutation($event_id, $data) {
 
     $timestamp = date_create('now');
 
+    if(empty($created)) {
+        $created = $timestamp
+    }
+
+    // TODO: map event IDs with an array();
+
+    // TODO: add and map values form data to params
+
+
     $params = array(
         'isWP' => true,
         'token' => $token,
         'position' => 1,
         'veranstaltungsID' => 4200,
-        'anmeldeZeitpunkt' => $timestamp->format('Y-m-d H:i:s'),
+        'anmeldeZeitpunkt' => date_create($created)->format('Y-m-d H:i:s'),
         'vorname' => 'leer',
         'nachname' => 'leer',
         'gebDat' => $timestamp->format('Y-m-d'),
@@ -232,6 +245,7 @@ function eca_registration_prepare_graphql_mutation($event_id, $data) {
         'extra_json' => '{}'
     );
 
+
     $params_str = '';
     foreach ($params as $key => $value) {
         // string
@@ -250,15 +264,10 @@ function eca_registration_prepare_graphql_mutation($event_id, $data) {
         }
     }
 
+
     if(!empty($params_str)) {
         return 'mutation { anmelden( ' . substr($params_str, 0, -2) . ') }';
     }
-
-
-    // TODO: map event IDs
-
-    // TODO: JSON decode & validate/sort data
-
 
 
     return '';

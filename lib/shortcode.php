@@ -98,6 +98,8 @@ function eca_get_filename($path) {
 
 function eca_initialisation_script() {
 
+  // TODO: alters beschränkung
+
   $script = "<script>
   const init_event = {
     id: 1,
