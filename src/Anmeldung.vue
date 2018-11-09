@@ -83,11 +83,13 @@ export default class Anmeldung extends Vue {
   public schema: { [name:string]: Array<string> } = {}
   public data: { [name: string]: boolean | number | string } = {};
 
-  get countdown() {
+  public countdown: boolean = false;
+
+  get timeDiff() {
     const now = new Date().getTime();
     const then = this.event.start.getTime();
     
-    return then - now > 0;
+    return then - now;
   }
 
   public printData() {
@@ -147,6 +149,18 @@ export default class Anmeldung extends Vue {
         }
       });
     });
+  }
+
+  created() {
+    // determine whether to show countdown or not 
+    this.countdown = this.timeDiff > 0;
+
+    // if countdown is visible,  set timeout to show Anmeldung
+    if(this.countdown) {
+      setTimeout(() => {
+          this.countdown = false;
+        }, this.timeDiff );
+    }
   }
 }
 </script>

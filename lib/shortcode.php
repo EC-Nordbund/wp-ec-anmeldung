@@ -100,7 +100,7 @@ function eca_initialisation_script() {
   const init_event = {
     id: 1,
     title: 'Test',
-    start: new Date('2018-11-09T02:55'),
+    start: new Date('2018-11-09T11:13'),
   };
   
   const init_form = {

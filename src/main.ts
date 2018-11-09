@@ -32,7 +32,7 @@ const init = (
 };
 (window as any).createAnmeldung = init;
 
-//start();
+start();
 
 function start() {
 
@@ -40,7 +40,7 @@ function start() {
   return init('app', {
     id: 1,
     title: 'Test',
-    start: new Date('2018-11-09T02:31:50'),
+    start: new Date('2018-11-09T11:19:50'),
   },
   {
     steps: [

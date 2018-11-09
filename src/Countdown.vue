@@ -75,6 +75,7 @@ export default class Countdown extends Vue {
 
             clearInterval(interval);
 
+            
             window.location.reload();
         }
     }
