@@ -6,58 +6,49 @@ require_once ECA_PLUGIN_DIR . '/lib/database.php';
 class ECA_LandingPage {
 
     public function handle_request($params) {
-        $token = $this->get_token($params);
-
-        $token = $params['t'];
-
-        $message = array();
+        $token = $this->token($params);
 
         if(!empty($token)) {
+
+            // select according registration
             $registration = eca_select_registration($token);
 
-            // return $registration;
+            $response = array(
+                'status' => $registration['status'],
+                'value' => 0
+            );
 
-            $status = $registration['status'];
+            $fetch_states = array(
+                'waiting_for_confirmation',
+                'delayed_expiration',
+                'waitingqueue',
+                'authentication_failed'
+            );
 
-            if($status === 'waiting_for_confirmation' || $status = 'persistent_data') {
+            if(in_array($response['status'], $fetch_states, true)) {
+
+                // send data to API and save response date
                 $response = eca_registration_send_to_server(
+                    $token,
                     $registration['event_id'],
                     json_decode($registration['data_as_json'], true)
                 );
 
-
-                // updates status 
-                $status = $this->handle_api_response($token, $response);
-
-                // delay expiration
-                if($status === 'delayed_expiration') {
-                    $expire = eca_registration_delay_expiration($token);
-                    $status = array('status' => $status, 'value' => $expire);
-                }
+                // updates status in DB
+                eca_update_registration_status($token, $response['status']);
             }
 
-            if(is_array($status)) {
-                $message = $this->eca_get_message_by_status($token, $status['status'], $status['value']);
-            } else {
-                $message = $this->eca_get_message_by_status($token, $status);
+            // generates message to depending status
+            $message = $this->eca_get_message_by_status($token, $response['status'], $response['value']);
 
-            }
-            
-            return $this->print_message($message['title'], $message['body']);
+            return $this->message($message['title'], $message['body']);
         }
 
-        return $this->print_message('Dieser Link ist ungültig');
+        return $this->message('Dieser Link ist ungültig');
     }
 
-    private function script_prameters($token = '') {
-        $html = '<script>';
-        $html .= 'token = "' . $token . '";';
-        $html .= '</script>';
 
-        return $html;
-    }
-
-    private function print_message($title, $message = '') {
+    private function message($title, $message = '') {
         $html = '';
 
         if(!empty($title)) {
@@ -72,7 +63,8 @@ class ECA_LandingPage {
         return $html;
     }
 
-    private function get_token($get) {
+
+    private function token($get) {
         $token = '';
 
         if(isset($get['t'])) {
@@ -82,16 +74,6 @@ class ECA_LandingPage {
         return $token;
     }
 
-    private function handle_api_response($token = '', $response = 'delayed_expiration') {
-
-        if(is_array($response) && !empty($response['status'])) {
-            eca_update_registration_status($token, $response['status']);
-        } else {
-            eca_update_registration_status($token, $response);
-        }
-
-        return $response;
-    }
 
     private function eca_get_message_by_status($token = 'no_token', $status = '', $value = 0) {
         $title = '';
@@ -100,18 +82,18 @@ class ECA_LandingPage {
         switch ($status) {
             case 'waiting_for_confirmation':
                 $title = 'Deine Anmeldung kann zur Zeit nicht entgegengenommen werden';
-                $body = '<p>Bitte versuche es zu einem späteren Zeitpunk nochmal.</p>';
+                $body = '<p>Bitte versuche es zu einem späteren Zeitpunkt nochmal.</p>';
                 break;
     
             case 'not_found':
                 $title = 'Keine Daten mit diesem Link gefunden';
-                $body = '<p>Überprüfe ob der Link mit der aus der Bestätigungs-E-Mail übereinstimmt.</p>';
+                $body = '<p>Überprüfe, ob der Link mit dem aus der Bestätigungs-E-Mail übereinstimmt.</p>';
                 break;
             
             case 'expired':
                 $title = 'Deine Anmeldedaten sind nicht mehr gültig';
-                $body .= '<p>Nachdem du das Anmeldeformular abgesendet hast, speichern wir deine Daten für 48 Stunden und senden dir eine E-Mail zu, in der du deine Anmeldung bestätigen und damit unserer Datenschutzerklärung zustimmen kannst.</p>';
-                $body .= '<p>Erst dann ist deinen Anmeldung bei uns eingegangen und gültig.</p>';
+                $body .= '<p>Nachdem du das Anmeldeformular abgesendet hast, speichern wir deine Daten für 48 Stunden und senden dir eine E-Mail mit der du deiner Daten bestätigen kannst.</p>';
+                $body .= '<p>Erst dann werden deinen Daten an uns entgültig übermittelt.</p>';
                 $body .= '<p><strong>Bitte, melde dich erneut bei der von dir ausgewählten Veranstaltung an und wiederhole den Prozess.</strong></p>';
                 break;
     
@@ -122,8 +104,8 @@ class ECA_LandingPage {
                     $title = 'Du bist auf der Warteliste';
                 }
                 $body .= '<p>Die Veranstaltung war zu dem Zeitpunkt deiner Anmeldung schon voll.</p>';
-                $body .= '<p><strong>Aber</strong> je nach Veranstaltung und Wartelistenplatz ist es nicht unwarscheinlich, dass du noch nachrückst.</p>';
-                $body .= '<p>In diesem Fall melden wir uns bei dir</p>';
+                $body .= '<p>Bitte beachte, dass es je nach Veranstaltung und Wartelistenplatz nicht unwarscheinlich ist noch nachzurücken.</p>';
+                $body .= '<p>In diesem Fall melden wir uns bei dir.</p>';
                 break;
 
             case 'successful_registered':
@@ -139,9 +121,8 @@ class ECA_LandingPage {
                 $title = 'Anmeldung zur Zeit nicht möglich';
                 $body = '<p>Wir verzögern das Löschen deiner Anmeldedaten um 24 Stunden</p>';
                 if($value > 0) {
-                    $body .= '<p>Deine Daten werden sind also noch bis zum ' . date('d.m. um H:i', $value) . 'gültig.</p>';
+                    $body .= '<p>Bitte probiere es bis morgen um ' . date('H:i', $value) . ' noch einmal aus.</p>';
                 }
-                $body .= '<p>Bitte probiere es innerhalb diese Zeitraumes nochmal.</p>';
                 break;
 
             case 'authentication_failed':

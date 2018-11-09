@@ -145,10 +145,18 @@ function eca_select_registration_status($token = '') {
     $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
 
     if(!empty($token)) {
-        $status = $wpdb->get_results("SELECT status FROM $anmelde_table WHERE token = '$token'", ARRAY_A);
+        $status = $wpdb->get_results("SELECT `status`, `expire_at` FROM $anmelde_table WHERE token = '$token'", ARRAY_A);
         
         if(!empty($status)) {
-            return $status[0];
+            $first = $status[0];
+            $exp = date_create($first['expire_at']);
+            $now = date_create('now');
+
+            if($exp < $now && $first['status'] !== 'successful_registered' && $first['status'] !== 'waitingqueue') {
+                $first['status'] = 'expired';
+            } 
+
+            return array('status' => $first['status']);
         }
     }
     
@@ -204,5 +212,7 @@ function eca_delete_expired_registration() {
 
     $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
 
-    return $wpdb->query("UPDATE `SNAdK_eca_anmeldung` SET `data_as_json` = '{}', `status` = 'expired' WHERE `expire_at` <= CURRENT_TIME AND `status` = 'waiting_for_confirmation' ");
+    $wpdb->query("UPDATE `SNAdK_eca_anmeldung` SET `data_as_json` = '{}' WHERE `expire_at` <= CURRENT_TIME ");
+    $wpdb->query("UPDATE `SNAdK_eca_anmeldung` SET `status`= 'expired' "
+        ."WHERE  `expire_at` <= CURRENT_TIME AND ( `status` = 'waiting_for_confirmation' OR `status` = 'delayed_expiration' )");        
 }

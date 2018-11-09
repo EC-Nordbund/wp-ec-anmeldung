@@ -53,7 +53,7 @@ function eca_handle_registration( WP_REST_Request $request) {
         if(empty($error)) {
             $token = hash(
                 'sha256',
-                json_encode($data)
+                json_encode($data) . date('c')
             );
         }
         
@@ -95,9 +95,9 @@ function eca_registration_status( WP_REST_Request $request) {
 
     $token = $params['token'];
 
-    $response = eca_select_registration_status($token);
+    $status = eca_select_registration_status($token);
 
-    return $response;
+    return $status;
 }
 
 
@@ -115,7 +115,7 @@ function eca_get_value_of_key_r($key, $array) {
     return $result; // key not in array
 }
 
-function eca_registration_send_to_server($event_id, $data) {
+function eca_registration_send_to_server($token, $event_id, $data) {
     $error = array();
 
     $mutation = eca_registration_prepare_graphql_mutation($event_id, $data);
@@ -157,7 +157,7 @@ function eca_registration_send_to_server($event_id, $data) {
     }
 
     $status = 'delayed_expiration';
-    $waiting_position = 0;
+    $value = 0;
 
     if(empty($error) && !empty($json['data']['anmelden'])) {
         $r = $json['data']['anmelden'];
@@ -182,17 +182,17 @@ function eca_registration_send_to_server($event_id, $data) {
             default:
                 if(is_int($r) && $r > 0) {
                     $status = 'waitingqueue';
-                    $waiting_position = $r;
+                    $value = $r;
                 } 
                 break;
         }
     }
-    
-    if($status === 'waitingqueue') {
-        return array('status' => $status, 'value' => $waiting_position);
+
+    if($status === 'delayed_expiration') {
+        $value = eca_registration_delay_expiration($token);
     }
 
-    return $status;
+    return array('status' => $status, 'value' => $value);
 }
 
 function eca_registration_prepare_graphql_mutation($event_id, $data) {
@@ -259,13 +259,7 @@ function eca_registration_prepare_graphql_mutation($event_id, $data) {
 
     // TODO: JSON decode & validate/sort data
 
-    // 0 = success
-    // positive zahle warteliste pos
 
-    // -1 = token stimmt nicht (keine berechtigung)
-    // -2 = person hat sich schon mal angemendelt für veranstaltung (daten ändern: referent@ec-nordbund.de)
-
-    // 4200 test veranstaltung 
 
     return '';
 }
