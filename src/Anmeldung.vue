@@ -1,46 +1,52 @@
 <template>
   <v-app>
 
-    <v-toolbar color="primary">
-      <v-spacer/>
-        <h1 color="white">
-          Anmeldung zu Veranstaltung: {{event.title}}
-        </h1>
-      <v-spacer/>
-    </v-toolbar>
+    <ec-countdown v-if="countdown" :until="event.start"/>
+    
+    <template v-else>
+    
+      <v-toolbar color="primary">
+        <v-spacer/>
+          <h1 color="white">
+            Anmeldung zu Veranstaltung: {{event.title}}
+          </h1>
+        <v-spacer/>
+      </v-toolbar>
 
-    <v-content>
-      <v-stepper v-model="currentStep" vertical non-linear>
-          <template v-for="(step, index) in form.steps">
+      <v-content>
+        <v-stepper v-model="currentStep" vertical non-linear>
+            <template v-for="(step, index) in form.steps">
 
-            <v-stepper-step  :step="index+1" :key="'s' + index" editable>
-              {{step.title}}
-              <small>{{step.hint}}</small>
-            </v-stepper-step>
+              <v-stepper-step  :step="index+1" :key="'s' + index" editable>
+                {{step.title}}
+                <small>{{step.hint}}</small>
+              </v-stepper-step>
 
-          <v-stepper-content :key="'c'+index" :step="index + 1">
-            <v-card>
-              <v-card-text>
-                <v-form>
-                  <ec-form-element 
-                    v-for="field in step.fields" 
-                    :field="field" 
-                    v-model="data[field.name]" 
-                    :key="'field' + step.name + field.name"
-                  />
-                </v-form>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer/>
-                <v-btn v-if="currentStep < form.steps.length" @click="currentStep++">Weiter</v-btn>
-                <v-btn v-else @click="printData()">Absenden</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-stepper-content>
-        
-        </template>
-      </v-stepper>
-    </v-content>
+            <v-stepper-content :key="'c'+index" :step="index + 1">
+              <v-card>
+                <v-card-text>
+                  <v-form>
+                    <ec-form-element 
+                      v-for="field in step.fields" 
+                      :field="field" 
+                      v-model="data[field.name]" 
+                      :key="'field' + step.name + field.name"
+                    />
+                  </v-form>
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer/>
+                  <v-btn v-if="currentStep < form.steps.length" @click="currentStep++">Weiter</v-btn>
+                  <v-btn v-else @click="printData()">Absenden</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-stepper-content>
+          
+          </template>
+        </v-stepper>
+      </v-content>
+
+    </template>
 
   </v-app>
 </template>
@@ -54,9 +60,12 @@ import datePicker from '@/components/date.vue'
 import schwimmen from "@/components/schwimmen.vue";
 import label from "@/components/label.vue";
 import checkbox from "@/components/checkbox";
+import Countdown from './Countdown.vue';
+
 
 Vue.config.productionTip = false;
 
+Vue.component('ec-countdown', Countdown)
 Vue.component('ec-form-element', formElement);
 Vue.component('ec-radio', radio)
 Vue.component('ec-date', datePicker)
@@ -73,6 +82,13 @@ export default class Anmeldung extends Vue {
 
   public schema: { [name:string]: Array<string> } = {}
   public data: { [name: string]: boolean | number | string } = {};
+
+  get countdown() {
+    const now = new Date().getTime();
+    const then = this.event.start.getTime();
+    
+    return then - now > 0;
+  }
 
   public printData() {
     console.log(this.data);

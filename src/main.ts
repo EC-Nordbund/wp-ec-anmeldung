@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import './plugins/vuetify.js';
 import Anmeldung from './Anmeldung.vue';
-// import router from './router'
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
 
@@ -28,19 +27,20 @@ const init = (
   sendHoock: (data: Array<{ [key: string]: string | number | boolean }>) => void,
 ) => {
   return new Vue({
-    // router: router(config),
-    render: (h) => h(Anmeldung, { props: { form, event }, on: { sended: sendHoock } }),
+    render: (h) => h(Anmeldung, { props: { form, event }}),
   }).$mount('#' + id);
 };
 (window as any).createAnmeldung = init;
 
-start();
+//start();
 
 function start() {
+
+
   return init('app', {
     id: 1,
     title: 'Test',
-    start: new Date(),
+    start: new Date('2018-11-09T02:31:50'),
   },
   {
     steps: [

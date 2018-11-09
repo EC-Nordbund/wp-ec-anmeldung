@@ -95,48 +95,64 @@ function eca_get_filename($path) {
 }
 
 function eca_initialisation_script() {
-  $script = "<script> window.createAnmeldung('app', {
-    vConfig: {
-      veranstaltungsID: 1,
-      bezeichnung: 'Test',
-      begin: new Date(),
-    },
-    form: [
+
+  $script = "<script>
+  const init_event = {
+    id: 1,
+    title: 'Test',
+    start: new Date('2018-11-09T02:55'),
+  };
+  
+  const init_form = {
+    steps: [
       {
-        name: 'pers',
+        name: 'person',
         title: 'Persöhnliche Daten',
         fields: [
           {
             name: 'geschlecht',
             label: '',
-            componentName: 'ec-radio',
+            component: 'ec-radio',
+            type: 'string',
+            required: true,
             values: [
               {
-                label: 'Männlich',
-                value: 'm'
+                label: 'männlich',
+                value: 'm',
               },
               {
-                label: 'Weiblich',
-                value: 'w'
-              }
+                label: 'weiblich',
+                value: 'w',
+              },
             ],
-            row: true
+            row: true,
+            rules: [
+              v => (!!v || v === '') || 'Bitte Geschlecht auswählen',
+            ],
           },
           {
             name: 'vorname',
             label: 'Vorname',
-            counter: 50
+            type: 'string',
+            required: true,
+            counter: true,
+            maxlength: 50,
           },
           {
             name: 'nachname',
             label: 'Nachname',
-            counter: 50
+            type: 'string',
+            required: true,
+            counter: true,
+            maxlength: 50,
           },
           {
             name: 'gebDat',
             label: 'Geburtsdatum',
-            componentName: 'ec-date'
-          }
+            type: 'string',
+            required: true,
+            component: 'ec-date',
+          },
         ],
       },
       {
@@ -146,122 +162,149 @@ function eca_initialisation_script() {
           {
             name: 'telefon',
             label: 'Telefonnummer',
+            type: 'string',
             required: true,
-            counter: 20
+            counter: true,
+            maxlength: 20,
           },
           {
             name: 'email',
             label: 'E-Mail',
+            type: 'string',
             required: true,
-            counter: 20
+            counter: true,
+            maxlength: 20,
           },
           {
             name: 'strasse',
             label: 'Strasse',
-            counter: 50,
-            required: true
+            type: 'string',
+            counter: true,
+            maxlength: 50,
+            required: true,
           },
           {
             name: 'plz',
             label: 'PLZ',
-            counter: 5,
-            required: true
+            type: 'string',
+            counter: true,
+            maxlength: 5,
+            required: true,
           },
           {
             name: 'ort',
             label: 'Ort',
-            counter: 50,
-            required: true
-          }
-        ]
+            type: 'string',
+            counter: true,
+            maxlength: 50,
+            required: true,
+          },
+        ],
       },
       {
-        name: 'bem',
-        title: 'Bemerkungen',
+        name: 'sonstiges',
+        title: 'Sonstiges',
         fields: [
           {
             name: 'vegetarisch',
-            label: 'Ich bin Vegetarier!',
-            componentName: 'v-checkbox'
-          },
-          {
-            name: 'bemerkungen',
-            label: 'Bemerkungen',
-            componentName: 'v-textarea'
+            label: 'Verplegung:',
+            required: true,
+            type: 'boolean',
+            component: 'v-select',
+            items: [
+              { text: 'normal', value: false, },
+              { text: 'vegetarisch', value: true },
+            ],
           },
           {
             name: 'lebensmittel',
             label: 'Lebensmittelunverträglichkeiten',
-            componentName: 'v-textarea'
+            type: 'string',
+            box: true,
+            component: 'v-textarea',
           },
           {
             name: 'gesundheitsinformationen',
-            label: 'Gesundheitsinformationen (was gibt es zu beachten, Krankheiten etc.)',
-            componentName: 'v-textarea'
+            label: 'Gesundheitsinformationen',
+            placeholder: 'z.b. Allergien, Krankheiten etc.',
+            box: true,
+            type: 'string',
+            component: 'v-textarea',
           }
         ]
       },
       {
-        name: 'erl',
+        name: 'permissions',
         title: 'Erlaubnisse',
         fields: [
           {
-            name: 'schwimen',
-            label: '_',
-            componentName: 'ec-schwimmen'
+            name: '',
+            label: 'Mein Sohn/Meine Tochter darf:',
+            type: 'none',
+            component: 'ec-label',
           },
           {
-            name: '_',
-            label: 'Mein Sohn/Meine Tochter darf...',
-            componentName: 'ec-label'
+            name: 'schwimmen',
+            label: 'Schwimmen',
+            type: 'boolean',
+            component: 'ec-checkbox',
           },
           {
             name: 'rad',
             label: 'Radfahren',
-            componentName: 'v-checkbox'
+            type: 'boolean',
+            component: 'ec-checkbox',
           },
           {
             name: 'klettern',
             label: 'Klettern',
-            componentName: 'v-checkbox'
+            type: 'boolean',
+            component: 'ec-checkbox',
           },
           {
             name: 'boot',
             label: 'Boot / Kanu fahren',
-            componentName: 'v-checkbox'
+            type: 'boolean',
+            component: 'ec-checkbox',
           },
           {
             name: 'entfernen',
             label: 'Sich in einer Gruppe von mindestens drei Personen eine begrenzte Zeit vom Camp entfernen / in die Stadt gehen',
-            componentName: 'v-checkbox'
-          }
-        ]
+            type: 'boolean',
+            component: 'ec-checkbox',
+          },
+        ],
       },
       {
-        name: 'tnBed',
+        name: 'agreements',
         title: 'Datenschutz & Teilnahmebedingungen',
         fields: [
           {
-            name: 'tnBedingungen',
+            name: 'agrees_teilnehmer_bedingung',
             required: true,
             label: 'Ich erkenne die Teilnahmebedingungen für Freizeiten an und melde mich hiermit verbindlich an. (ggf. Einverständnis des Erziehungsberechtigten)',
-            componentName: 'v-checkbox'
+            type: 'boolean',
+            component: 'ec-checkbox',
           },
           {
-            name: 'datenschutz',
+            name: 'agrees_datenschutz',
             required: true,
             label: 'Ich bin damit Einverstanden, dass die eingegeben Daten (vorerst) für bis zu 48 Stunden gespeichert werden. Während dieser Zeit hat niemand Zugriff auf diese Daten. Ich erhalte eine E-Mail mit weiteren Informationen zum Datenschutz die ich bestätigen muss bevor die Anmeldung weiterverarbeitet wird. Als Anmeldezeitpunkt für die Warteliste etc. wird der Zeitpunkt der Bestätigung angenommen. Nach 48 Stunden ohne Bestätigung wird die Anmeldung gelöscht.',
-            componentName: 'v-checkbox'
+            type: 'boolean',
+            component: 'ec-checkbox',
           },
           {
-            name: 'fahrgemeinschaften',
+            name: 'agrees_fahrgemeinschaften',
             label: 'Hiermit willige ich ein, dass meine Anschrift zum Zweck der Bildung von Fahrgemeinschaften bei der Organisation der An- und/oder Abreise an die anderen Teilnehmer der Reisegruppe weitergegeben werden darf. Die Erteilung der Einwilligung ist freiwillig.',
-            componentName: 'v-checkbox'
-          }
-        ]
-      }
+            type: 'boolean',
+            component: 'ec-checkbox',
+          },
+        ],
+      },
     ],
-  }, console.log);
+  };
+  
+  window.createAnmeldung('app', init_event, init_form);
   </script>";
 
   return $script;
