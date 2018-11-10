@@ -1,18 +1,4 @@
 <template>
-  <v-app>
-
-      <v-toolbar color="primary">
-        <v-spacer/>
-          <h1 color="white">
-            Anmeldung zu Veranstaltung: {{event.title}}
-          </h1>
-        <v-spacer/>
-      </v-toolbar>
-
-      <ec-countdown v-if="countdown" :until="event.start"/>
-      
-      <template v-else>
-
       <v-content fluid full-width fill-height>
         <v-stepper v-model="currentStep" vertical non-linear>
             <template v-for="(step, index) in form.steps">
@@ -45,10 +31,6 @@
           </template>
         </v-stepper>
       </v-content>
-
-    </template>
-
-  </v-app>
 </template>
 
 
@@ -83,14 +65,6 @@ export default class Anmeldung extends Vue {
   public schema: { [name:string]: Array<string> } = {}
   public data: { [name: string]: boolean | number | string } = {};
 
-  public countdown: boolean = false;
-
-  get timeDiff() {
-    const now = new Date().getTime();
-    const then = this.event.start.getTime();
-    
-    return then - now;
-  }
 
   public printData() {
     console.log(this.data);
@@ -153,18 +127,6 @@ export default class Anmeldung extends Vue {
       });
 
     });
-  }
-
-  created() {
-    // determine whether to show countdown or not 
-    this.countdown = this.timeDiff > 0;
-
-    // if countdown is visible,  set timeout to show Anmeldung
-    if(this.countdown) {
-      setTimeout(() => {
-          this.countdown = false;
-        }, this.timeDiff );
-    }
   }
 }
 </script>

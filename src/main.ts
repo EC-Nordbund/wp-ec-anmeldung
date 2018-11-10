@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import './plugins/vuetify.js';
-import Anmeldung from './Anmeldung.vue';
+import Dialog from './Dialog.vue';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
 
@@ -27,7 +27,7 @@ const init = (
   sendHoock: (data: Array<{ [key: string]: string | number | boolean }>) => void,
 ) => {
   return new Vue({
-    render: (h) => h(Anmeldung, { props: { form, event }}),
+    render: (h) => h(Dialog, { props: { form, event }}),
   }).$mount('#' + id);
 };
 (window as any).createAnmeldung = init;
@@ -40,7 +40,7 @@ function start() {
   return init('anmeldung', {
     id: 1,
     title: 'Test',
-    start: new Date('2018-11-09T11:19:50'),
+    start: new Date('2018-11-10T12:51:00'),
   },
   {
     steps: [

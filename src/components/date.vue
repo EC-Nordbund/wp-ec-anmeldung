@@ -14,8 +14,8 @@
       slot="activator"
       readonly
       v-model="german"
-      prepend-icon="mdi-event"
       v-bind="$attrs"
+      @blur="menu = true"
     />
     <v-date-picker
     v-model="date"
