@@ -93,7 +93,7 @@ class ECA_LandingPage {
             
             case 'expired':
                 $title = 'Deine Anmeldedaten sind nicht mehr gültig';
-                $body .= '<p>Nachdem du das Anmeldeformular abgesendet hast, speichern wir deine Daten für 48 Stunden und senden dir eine E-Mail mit der du deiner Daten bestätigen kannst.</p>';
+                $body .= '<p>Nachdem du das Anmeldeformular abgesendet hast, speichern wir deine Daten für 24 Stunden und senden dir eine E-Mail mit der du deiner Daten bestätigen kannst.</p>';
                 $body .= '<p>Erst dann werden deinen Daten an uns entgültig übermittelt.</p>';
                 $body .= '<p><strong>Bitte, melde dich erneut bei der von dir ausgewählten Veranstaltung an und wiederhole den Prozess.</strong></p>';
                 break;

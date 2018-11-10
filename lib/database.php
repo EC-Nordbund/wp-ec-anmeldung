@@ -88,7 +88,7 @@ function eca_add_registration($event_id, $data, $token)
         $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
 
         $timestamp = date_create_immutable_from_format('Y-m-d H:i:s', current_time('mysql'));
-        $expiration = $timestamp->add(new DateInterval('PT48H')); // 48h later as timestamp (current time)
+        $expiration = $timestamp->add(new DateInterval('PT24H')); // 24h later as timestamp (current time)
 
         $insert = $wpdb->insert(
             $anmelde_table,
@@ -186,7 +186,7 @@ function eca_registration_delay_expiration($token = '') {
 
     if(!empty($token)) {
         $timestamp = date_create_immutable_from_format('Y-m-d H:i:s', current_time('mysql'));
-        $expiration = $timestamp->add(new DateInterval('PT48H')); // 48h later as timestamp (current time)
+        $expiration = $timestamp->add(new DateInterval('PT24H')); // 24h later as timestamp (current time)
 
         $wpdb->update(
             $anmelde_table,
