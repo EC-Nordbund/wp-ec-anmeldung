@@ -37,7 +37,7 @@ start();
 function start() {
 
 
-  return init('app', {
+  return init('anmeldung', {
     id: 1,
     title: 'Test',
     start: new Date('2018-11-09T11:19:50'),

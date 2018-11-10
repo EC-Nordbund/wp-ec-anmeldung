@@ -33,7 +33,7 @@ function eca_anmeldung_shortcode($atts) {
     $html .= "</noscript>";
 
     $html .= '<div class="anmelde-wrapper">';
-      $html .= '<div id="app">';
+      $html .= '<div id="anmeldung">';
       $html .= "</div>";
     $html .= '</div>';
 
@@ -308,7 +308,7 @@ function eca_initialisation_script() {
     ],
   };
   
-  window.createAnmeldung('app', init_event, init_form);
+  window.createAnmeldung('anmeldung', init_event, init_form);
   </script>";
 
   return $script;
