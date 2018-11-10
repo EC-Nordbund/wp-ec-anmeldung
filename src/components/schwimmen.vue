@@ -2,9 +2,9 @@
   <div>
     <v-checkbox v-model="erlaubt" label="Mein Sohn / Meine Tochter darf beim Baden / Schwimmen Teilnehmen"/>
     <v-radio-group v-model="radio" :disabled="!erlaubt" label="Die Schwimmfähigkeit schätze ich als ... ein.">
-      <v-radio label="Gut" value="3"/>
-      <v-radio label="Mittel" value="2"/>
-      <v-radio label="Nichtschwimmer" value="1"/>
+      <v-radio label="Gut" :value="3"/>
+      <v-radio label="Mittel" :value="2"/>
+      <v-radio label="Nichtschwimmer" :value="1"/>
     </v-radio-group>
   </div>
 </template>
