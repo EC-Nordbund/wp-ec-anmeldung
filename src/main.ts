@@ -32,7 +32,7 @@ const init = (
 };
 (window as any).createAnmeldung = init;
 
-start();
+//start();
 
 function start() {
 

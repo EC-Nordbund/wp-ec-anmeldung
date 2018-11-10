@@ -32,6 +32,8 @@ function eca_anmeldung_shortcode($atts) {
     $html .= "<strong>We're sorry but vue-ec-anmeldung doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>";
     $html .= "</noscript>";
 
+    $html .= '<style> .application--wrap { min-height: unset !important; } </style>';
+
     $html .= '<div class="anmelde-wrapper">';
       $html .= '<div id="anmeldung">';
       $html .= "</div>";
@@ -39,7 +41,7 @@ function eca_anmeldung_shortcode($atts) {
 
     $html .= eca_add_script_tags();
 
-    $html .= eca_initialisation_script();
+    $html .= eca_initialisation_script($event_id);
 
     return $html;
 }
@@ -78,13 +80,13 @@ function eca_get_filename($path) {
     return end($array);
 }
 
-function eca_initialisation_script() {
+function eca_initialisation_script($event_id = -1) {
 
   // TODO: alters beschränkung
 
   $script = "<script>
   const init_event = {
-    id: 1,
+    id: " . $event_id . ",
     title: 'Test',
     start: new Date('2018-11-10T11:01'),
   };
