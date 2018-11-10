@@ -1,8 +1,6 @@
 <template>
   <v-app>
 
-    
-    
       <v-toolbar color="primary">
         <v-spacer/>
           <h1 color="white">
@@ -15,7 +13,7 @@
       
       <template v-else>
 
-      <v-content>
+      <v-content fluid full-width fill-height>
         <v-stepper v-model="currentStep" vertical non-linear>
             <template v-for="(step, index) in form.steps">
 

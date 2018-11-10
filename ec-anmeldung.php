@@ -28,9 +28,6 @@ $eca = new ECA_LandingPage();
 // Add API endpoints
 add_action('rest_api_init', 'eca_api_form_submission');
 
-// Register scripts and styles
-add_action('wp_enqueue_scripts', 'eca_register_scripts_and_styles');
-
 // Declare action to delete all expired registration data in database
 add_action('eca_delete_expired_registration', 'eca_delete_expired_registration');
 

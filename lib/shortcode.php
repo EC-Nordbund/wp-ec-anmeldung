@@ -26,7 +26,7 @@ function eca_anmeldung_shortcode($atts) {
         return 'No matching form found.';
     }
 
-    eca_enqueue_scripts_and_styles();
+    eca_equeue_styles();
 
     $html  = "<noscript>";
     $html .= "<strong>We're sorry but vue-ec-anmeldung doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>";
@@ -44,15 +44,6 @@ function eca_anmeldung_shortcode($atts) {
     return $html;
 }
 
-function eca_enqueue_scripts_and_styles() {
-    //wp_enqueue_script('eca_script_app');
-    //wp_enqueue_script('eca_script_chunk');
-
-    //wp_enqueue_style('google_fonts_roboto');
-    //wp_enqueue_style('mdi');
-    wp_enqueue_style('eca_style');
-}
-
 function eca_add_script_tags() {
   $apps = glob(ECA_PLUGIN_DIR . '/lib/anmeldung/js/app.*.js');
   $app_name = end( explode('/', reset($apps)) );
@@ -67,26 +58,17 @@ function eca_add_script_tags() {
   return $scripts;
 }
 
-function eca_register_scripts_and_styles() {
-    $apps = glob(ECA_PLUGIN_DIR . '/lib/anmeldung/js/app.*.js');
-    $chunks = glob(ECA_PLUGIN_DIR . '/lib/anmeldung/js/chunk-vendors.*.js');
+function eca_equeue_styles() {
+   
     $styles = glob(ECA_PLUGIN_DIR . '/lib/anmeldung/css/*.css');
 
-    // register app script
-    $app_name = end( explode('/', reset($apps)) );
-    wp_register_script('eca_script_app', ECA_PLUGIN_LIB_URL . 'anmeldung/js/' . $app_name, array('eca_script_chunk'), false, true);
+    foreach($styles as $style) {
+      // registers app styles
+      $style_name = end( explode('/', $style) );
+      wp_enqueue_style('eca_style' . $style_name, ECA_PLUGIN_LIB_URL . 'anmeldung/css/' . $style_name);
+    }
 
-    // register chunk scripts
-    $chunk_name = end( explode('/', reset($chunks)) );
-    wp_register_script('eca_script_chunk', ECA_PLUGIN_LIB_URL . 'anmeldung/js/' . $chunk_name, array(), false, true);
 
-    // register styles
-    wp_register_style('google_fonts_roboto', 'https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900');
-    wp_register_style('mdi', 'https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css');
-
-    // registers app styles
-    $style_name = end( explode('/', reset($styles)) );
-    wp_register_style('eca_style', ECA_PLUGIN_LIB_URL . 'anmeldung/css/' . $style_name);
 }
 
 function eca_get_filename($path) {
@@ -104,7 +86,7 @@ function eca_initialisation_script() {
   const init_event = {
     id: 1,
     title: 'Test',
-    start: new Date('2018-11-11T15:00'),
+    start: new Date('2018-11-10T11:01'),
   };
   
   const init_form = {
