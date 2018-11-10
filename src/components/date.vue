@@ -53,10 +53,6 @@ export default class DatePicker extends Vue {
 
   @Watch('menu')
   onDialogOpenChange(val: boolean) {
-    // return val;
-
-
-    // TODO: 
     return val && this.$nextTick(() => ((this.$refs.picker as any).activePicker = 'YEAR'));
   }
 
