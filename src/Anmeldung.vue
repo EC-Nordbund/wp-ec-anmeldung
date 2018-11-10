@@ -106,7 +106,7 @@ export default class Anmeldung extends Vue {
 
   public printData() {
     console.log(this.data);
-    //this.submitData();
+    this.submitData();
   }
 
   public submitData() {
@@ -122,12 +122,19 @@ export default class Anmeldung extends Vue {
           'Content-Type': 'application/json'
         }
       })
-      .then(response => {
-        console.log(response.data);
+      .then(res=>res.data)
+      .then(res => {
+        if(res.state=="success"){
+          alert('Daten wurden erfolgreich übermittelt...')
+          location.href="https://ec-nordbnd.de"
+        } else {
+          throw ''
+        }
       })
       .catch(error => {
         console.log(error);
-      });
+        alert('Bei der Übertragung der Daten ist ein Fehler aufgetreten. Bitte probiere es zu einem Späteren Zeitpunkt erneut.')
+      })
   }
 
   @Prop({
