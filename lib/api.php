@@ -118,11 +118,22 @@ function eca_get_value_of_key_r($key, $array) {
 function eca_registration_send_to_server($token, $event_id, $data, $created) {
     $error = array();
 
-    // TODO: check for required fields
+    $api_event_id = eca_event_id_mapping($event_id);
 
+    // TODO: entfernen
+    $api_event_id = 4200;
+
+    $valid = eca_check_required_fields($api_event_id, $date);
+
+    if(!$valid['state']) {
+        $error['validation'] = $valid['value'];
+    }
 
     if(empty($error)) {
         $mutation = eca_registration_prepare_graphql_mutation($event_id, $data, $created);
+
+        print($mutation);
+
         $query = json_encode(array('query' => $mutation));
 
         $ch = curl_init();
@@ -163,14 +174,15 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
     $status = 'delayed_expiration';
     $value = 0;
 
-    if(empty($error) && !empty($json['data']['anmelden'])) {
-        $r = $json['data']['anmelden'];
+    if(empty($error) && !empty($json['data']['anmelden']['status'])) {
+        $r = $json['data']['anmelden']['status'];
 
         switch ($r) {
 
             // duplicate person & event combi
             case -2:
                 $status = 'person_already_registered';
+                $status = 'waiting_for_confirmation';
                 break;
             
             // Authentifizierungsfehler
@@ -208,20 +220,11 @@ function eca_registration_prepare_graphql_mutation($event_id, $data, $created) {
 
     $timestamp = date_create('now');
 
-    if(empty($created)) {
-        $created = $timestamp;
-    }
-
-    // TODO: map event IDs with an array();
-
-    // TODO: add and map values form data to params
-
-
     $params = array(
         'isWP' => true,
         'token' => $token,
         'position' => 1,
-        'veranstaltungsID' => 4200,
+        'veranstaltungsID' => -1,
         'anmeldeZeitpunkt' => date_create($created)->format('Y-m-d H:i:s'),
         'vorname' => 'leer',
         'nachname' => 'leer',
@@ -245,30 +248,226 @@ function eca_registration_prepare_graphql_mutation($event_id, $data, $created) {
         'extra_json' => '{}'
     );
 
+    if(empty($created)) {
+        $created = $timestamp;
+    }
+
+    if(isset($api_event_id)) {
+        $param['veranstaltungsID'] = $api_event_id;
+    } 
+
+    if(isset($data['geschlecht'])) {
+        $params['geschlecht'] = $data['geschlecht'];
+    }
+
+    if(isset($data['vorname'])) {
+        $params['vorname'] = $data['vorname'];
+    }
+
+    if(isset($data['nachname'])) {
+        $params['nachname'] = $data['nachname'];
+    }
+
+    if(isset($data['gebDat'])) {
+        $params['gebDat'] = $data['gebDat'];
+    }
+
+    if(isset($data['telefon'])) {
+        $params['telefon'] = $data['telefon'];
+    }
+
+    if(isset($data['email'])) {
+        $params['eMail'] = $data['email'];
+    }
+
+    if(isset($data['strasse'])) {
+        $params['strasse'] = $data['strasse'];
+    }
+
+    if(isset($data['plz'])) {
+        $params['plz'] = $data['plz'];
+    }
+
+    if(isset($data['ort'])) {
+        $params['ort'] = $data['ort'];
+    }
+
+    if(isset($data['vegetarisch'])) {
+        $params['vegetarisch'] = $data['vegetarisch'];
+    }
+
+    if(isset($data['lebensmittel'])) {
+        $params['lebensmittelAllergien'] = $data['lebensmittel'];
+    }
+
+    if(isset($data['gesundheitsinformationen'])) {
+        $params['gesundheitsinformationen'] = $data['gesundheitsinformationen'];
+    }
+
+    if(isset($data['schwimmen'])) {
+        $params['schwimmen'] = $data['schwimmen'];
+    }
+
+    if(isset($data['rad'])) {
+        $params['radfahren'] = $data['rad'];
+    }
+
+    if(isset($data['klettern'])) {
+        $params['klettern'] = $data['klettern'];
+    }
+
+    if(isset($data['boot'])) {
+        $params['bootFahren'] = $data['boot'];
+    }
+
+    if(isset($data['entfernen'])) {
+        $params['sichEntfernen'] = $data['entfernen'];
+    }
+
+    if(isset($data['agrees_fahrgemeinschaften'])) {
+        $params['fahrgemeinschaften'] = $data['agrees_fahrgemeinschaften'];
+    }
+
+    
+    // TODO: extra fields (json)
+
+
 
     $params_str = '';
     foreach ($params as $key => $value) {
         // string
         if(is_string($value)) { 
             $params_str .= $key . ': "' . $value . '", ';
+            // $params_str .= $key . ': "string", ';
+
         }
 
         // numeric
         if(is_int($value)) { 
             $params_str .= $key . ': ' . $value . ', ';
+            // $params_str .= $key . ': "int", ';
+
         }
 
         // boolean
         if(is_bool($value)) {
             $params_str .= $key . ': ' . ($value ? 'true' : 'false') . ', ';
+            // $params_str .= $key . ': "boolean", ';
         }
     }
 
 
     if(!empty($params_str)) {
-        return 'mutation { anmelden( ' . substr($params_str, 0, -2) . ') }';
+        return 'mutation { anmelden( ' . substr($params_str, 0, -2) . ') { status, anmeldeID } }';
     }
 
 
     return '';
+}
+
+
+function eca_check_required_fields($event_id, $date) {
+    $state = true;
+    $value = '';
+
+    // event id positiv 
+    if(!is_integer($event_id) || $event_id < 0) {
+        $state = false;
+        $value = 'event_id no positive integer';
+    }
+
+    $required =array(
+        'email' => 'Email is required.',
+        'vorname' => 'Vorname is required',
+        'nachname' => 'Nachname is required',
+        'gebDat' => 'Geburtsdatum is required'
+    );
+
+    if($status) {
+        foreach ($required as $name => $val) {
+            if(empty($data[$name])) {
+                $state = false;
+                $value = $val;
+            }
+        }
+    }
+
+    return array('state' => $state, 'value' => $value);
+}
+
+
+function eca_event_id_mapping($wp_event_id) {
+    $api_event_id = -1;
+
+    switch ($wp_event_id) {
+
+        case 61:
+            $api_event_id = 400; // MAWE
+            break;
+
+        case 62:
+            $api_event_id = 401; // ECK1
+            break;
+
+        case 63:
+            $api_event_id = 402; // ECK2
+            break;
+
+        case 64:
+            $api_event_id = 403; // MaTa
+            break;
+
+        case 65:
+            $api_event_id = 404; // JLC
+            break;
+
+        case 66:
+            $api_event_id = 405; // TO
+            break;
+
+        case 67:
+            $api_event_id = 406; // BC
+            break;
+
+        case 68:
+            $api_event_id = 407; // PC
+            break;
+
+        case 69:
+            $api_event_id = 408; // LJF1
+            break;
+
+        case 70:
+            $api_event_id = 409; // LJF2
+            break;
+
+        case 71:
+            $api_event_id = 410; // TC
+            break;
+
+        case 72:
+            $api_event_id = 411; // JuFr
+            break;
+
+        case 73:
+            $api_event_id = 412; // JEF
+            break;
+
+        case 74:
+            $api_event_id = 413; // AF
+            break;
+
+        case 75:
+            $api_event_id = 414; // RF
+            break;
+
+        case 76:
+            $api_event_id = 415;  // TO
+            break;
+
+        default:
+            break;
+    }
+
+    return $api_event_id;
 }
