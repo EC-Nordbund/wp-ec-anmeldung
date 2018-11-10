@@ -35,9 +35,10 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer/>
+                  <v-progress-circular indeterminate color="accent" v-if="blockSend"/>
                   <v-btn :disabled="currentStep===1" @click="currentStep--">Zurück</v-btn>
                   <v-btn v-if="currentStep < form.steps.length" @click="currentStep++">Weiter</v-btn>
-                  <v-btn :disabled="!isValid" v-else @click="printData()">Absenden</v-btn>
+                  <v-btn :disabled="blockSend || !isValid" v-else @click="printData()">Absenden</v-btn>
                 </v-card-actions>
               </v-card>
             </v-stepper-content>
@@ -106,7 +107,13 @@ export default class Anmeldung extends Vue {
 
   public printData() {
     console.log(this.data);
-    this.submitData();
+    if(Object.keys(this.valid).map(key=>this.valid[key]).reduce((a,b)=>a&&b, true) && this.form.steps.map(
+      v=>(v.rules||[]).map(r=>r(this.data)).reduce((a,b)=>a&&b,true)
+    ).reduce((a,b)=>a&&b, true)) {
+      this.submitData();
+    } else {
+      alert("Fehlerhafte Daten")
+    }
   }
 
   public submitData() {
@@ -115,6 +122,8 @@ export default class Anmeldung extends Vue {
       data: this.data,
       schema: this.schema
     });
+
+    this.blockSend=true
 
     Axios
       .post('https://www.ec-nordbund.de/wp-json/ec-api/v1/anmeldung', json, {
@@ -134,6 +143,8 @@ export default class Anmeldung extends Vue {
       .catch(error => {
         console.log(error);
         alert('Bei der Übertragung der Daten ist ein Fehler aufgetreten. Bitte probiere es zu einem Späteren Zeitpunkt erneut.')
+      }).then(v=>{
+        this.blockSend=false
       })
   }
 
@@ -141,6 +152,8 @@ export default class Anmeldung extends Vue {
     required: true,
   })
   public event!: Event;
+
+  blockSend = false
 
   @Prop({
     required: true,
