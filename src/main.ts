@@ -213,7 +213,7 @@ function start() {
           {
             name: 'schwimmen',
             label: 'Schwimmen',
-            type: 'boolean',
+            type: 'number',
             component: 'ec-schwimmen',
           },
           {

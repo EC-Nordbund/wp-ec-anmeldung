@@ -192,7 +192,9 @@ export default class Anmeldung extends Vue {
           case 'string':
             this.data[field.name] = '';
             break;
-        
+          case 'number':
+            this.data[field.name] = 0;
+            break;
           default:
             break;
         }
