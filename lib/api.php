@@ -240,6 +240,7 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
                 if(is_int($r) && $r > 0) {
                     $status = 'waitingqueue';
                     $value = $r;
+                    // TODO: Warteliste Mail
                 } 
                 break;
         }
