@@ -13,10 +13,10 @@
     <template v-else>
 
       <v-content>
-        <v-stepper v-model="currentStep" vertical non-linear>
+        <v-stepper v-model="currentStep" vertical>
           <template v-for="(step, index) in form.steps">
 
-            <v-stepper-step :step="index+1" :key="'s' + index" editable>
+            <v-stepper-step :rules="(step.rules||[]).map(v=>(()=>visited.indexOf(index+1)===-1||v(data)))" :step="index+1" :key="'s' + index" editable>
               {{step.title}}
               <small>{{step.hint}}</small>
             </v-stepper-step>
@@ -35,7 +35,8 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer/>
-                  <v-btn :disabled="!valid[index]" v-if="currentStep < form.steps.length" @click="currentStep++">Weiter</v-btn>
+                  <v-btn :disabled="currentStep===1" @click="currentStep--">Zurück</v-btn>
+                  <v-btn v-if="currentStep < form.steps.length" @click="currentStep++">Weiter</v-btn>
                   <v-btn v-else @click="printData()">Absenden</v-btn>
                 </v-card-actions>
               </v-card>
@@ -77,6 +78,13 @@ import { Form, Event } from '@/config';
 @Component({})
 export default class Anmeldung extends Vue {
   public currentStep: number = 1;
+
+  @Watch('currentStep')
+  onStepChange() {
+    if(this.visited.indexOf(this.currentStep)===-1){
+      this.visited.push(this.currentStep)
+    }
+  }
 
   public schema: { [name:string]: Array<string> } = {}
   public data: { [name: string]: boolean | number | string } = {};
@@ -127,6 +135,8 @@ export default class Anmeldung extends Vue {
     required: true,
   })
   public form!: Form;
+
+  visited = [1]
 
   @Watch('config', { immediate: true })
   public onConfigChange() {

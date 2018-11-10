@@ -47,6 +47,9 @@ function start() {
       {
         name: 'person',
         title: 'Persöhnliche Daten',
+        rules: [
+          v=>v.geschlecht&&v.vorname&&v.vorname.length > 0 && v.nachname && v.nachname.length > 0 && v.gebDat && v.gebDat.length > 0
+        ],
         fields: [
           {
             name: 'geschlecht',
@@ -58,7 +61,7 @@ function start() {
               {
                 label: 'männlich',
                 value: 'm',
-              },
+                },
               {
                 label: 'weiblich',
                 value: 'w',
@@ -103,6 +106,9 @@ function start() {
       {
         name: 'kontakt',
         title: 'Kontaktdaten',
+        rules: [
+          v=>v.telefon && v.telefon.length >0 && v.email && v.email.length > 0 && v.strasse && v.strasse.length > 0 && v.plz && v.plz.length === 5 && v.ort && v.ort.length > 0
+        ],
         fields: [
           {
             name: 'telefon',
@@ -146,7 +152,7 @@ function start() {
             required: true,
             rules: [
               v=>v?true:'Bitte eine PLZ angeben',
-              v=>(v&&v.length===5)?true:'Bitte eine PLZ angeben, die genau 5 Zeichen lang ist.'
+              v=>(v&&typeof v === 'string'&&v.length===5)?true:'Bitte eine PLZ angeben, die genau 5 Zeichen lang ist.'
             ]
           },
           {
@@ -239,26 +245,23 @@ function start() {
       {
         name: 'agreements',
         title: 'Datenschutz & Teilnahmebedingungen',
+        rules: [
+          v=>v.agrees_teilnehmer_bedingung&&v.agrees_datenschutz
+        ],
         fields: [
           {
             name: 'agrees_teilnehmer_bedingung',
             required: true,
             label: 'Ich erkenne die Teilnahmebedingungen für Freizeiten an und melde mich hiermit verbindlich an. (ggf. Einverständnis des Erziehungsberechtigten)',
             type: 'boolean',
-            component: 'ec-checkbox',
-            rules: [
-              v=>v?true:'Die Akzeptierung der Teilnahmebedingungen ist notwendig.'
-            ]
+            component: 'ec-checkbox'
           },
           {
             name: 'agrees_datenschutz',
             required: true,
             label: 'Ich bin damit Einverstanden, dass die eingegeben Daten (vorerst) für bis zu 48 Stunden gespeichert werden. Während dieser Zeit hat niemand Zugriff auf diese Daten. Ich erhalte eine E-Mail mit weiteren Informationen zum Datenschutz die ich bestätigen muss bevor die Anmeldung weiterverarbeitet wird. Als Anmeldezeitpunkt für die Warteliste etc. wird der Zeitpunkt der Bestätigung angenommen. Nach 48 Stunden ohne Bestätigung wird die Anmeldung gelöscht.',
             type: 'boolean',
-            component: 'ec-checkbox',
-            rules: [
-              v=>v?true:'Die Akzeptierung der Datenschutzbedingungen ist notwendig.'
-            ]
+            component: 'ec-checkbox'
           },
           {
             name: 'agrees_fahrgemeinschaften',
