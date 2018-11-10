@@ -110,7 +110,7 @@ class ECA_LandingPage {
                 break;
 
             case 'successful_registered':
-                $title = 'Deine Angemeldung war erfolgreich!';
+                $title = 'Deine Anmeldung war erfolgreich!';
                 break;
             
             case 'person_already_registered':

@@ -130,10 +130,7 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
     }
 
     if(empty($error)) {
-        $mutation = eca_registration_prepare_graphql_mutation($event_id, $data, $created);
-
-        print($mutation);
-
+        $mutation = eca_registration_prepare_graphql_mutation($api_event_id, $data, $created);
         $query = json_encode(array('query' => $mutation));
 
         $ch = curl_init();
@@ -174,7 +171,7 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
     $status = 'delayed_expiration';
     $value = 0;
 
-    if(empty($error) && !empty($json['data']['anmelden']['status'])) {
+    if(empty($error) && is_integer($json['data']['anmelden']['status'])) {
         $r = $json['data']['anmelden']['status'];
 
         switch ($r) {
@@ -182,7 +179,6 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
             // duplicate person & event combi
             case -2:
                 $status = 'person_already_registered';
-                $status = 'waiting_for_confirmation';
                 break;
             
             // Authentifizierungsfehler
@@ -252,8 +248,8 @@ function eca_registration_prepare_graphql_mutation($event_id, $data, $created) {
         $created = $timestamp;
     }
 
-    if(isset($api_event_id)) {
-        $param['veranstaltungsID'] = $api_event_id;
+    if(isset($event_id)) {
+        $params['veranstaltungsID'] = $event_id;
     } 
 
     if(isset($data['geschlecht'])) {
