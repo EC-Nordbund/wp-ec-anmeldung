@@ -107,9 +107,21 @@ export default class Anmeldung extends Vue {
 
   public printData() {
     console.log(this.data);
-    if(Object.keys(this.valid).map(key=>this.valid[key]).reduce((a,b)=>a&&b, true) && this.form.steps.map(
-      v=>(v.rules||[]).map(r=>r(this.data)).reduce((a,b)=>a&&b,true)
-    ).reduce((a,b)=>a&&b, true)) {
+
+    const reduce = (arr:Array<boolean>)=>{
+      return arr.reduce((a,b)=>a&&b, true)
+    }
+
+    const steppersValid = 
+      reduce(
+        this.form.steps.map(
+          v=>reduce(
+            (v.rules||[]).map(r=>r(this.data))
+          )
+        )
+      )
+    const formsValid = reduce(Object.keys(this.valid).map(key=>this.valid[key]))
+    if(steppersValid && formsValid) {
       this.submitData();
     } else {
       alert("Fehlerhafte Daten")
