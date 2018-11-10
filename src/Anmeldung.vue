@@ -37,7 +37,7 @@
                   <v-spacer/>
                   <v-btn :disabled="currentStep===1" @click="currentStep--">Zurück</v-btn>
                   <v-btn v-if="currentStep < form.steps.length" @click="currentStep++">Weiter</v-btn>
-                  <v-btn v-else @click="printData()">Absenden</v-btn>
+                  <v-btn :disabled="!isValid" v-else @click="printData()">Absenden</v-btn>
                 </v-card-actions>
               </v-card>
             </v-stepper-content>
@@ -92,6 +92,10 @@ export default class Anmeldung extends Vue {
   public countdown: boolean = false;
 
   public valid: any = {}
+
+  get isValid() {
+    return Object.keys(this.valid).map(key=>this.valid[key]).reduce((a,b)=>a&&b, true)
+  }
 
   get timeDiff() {
     const now = new Date().getTime();
