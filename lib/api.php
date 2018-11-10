@@ -27,7 +27,7 @@ function eca_api_form_submission() {
 }
 
 function eca_handle_registration( WP_REST_Request $request) {
-    $response = new stdClass(); // json: {}
+    $response = array();
 
     $params = $request->get_json_params();
 
@@ -80,12 +80,18 @@ function eca_handle_registration( WP_REST_Request $request) {
             }
         }
 
-        if(!empty($error)) {
-            $response = array('error' => $error);
-        }
+        if(empty($error)) {
+             return array('state' => 'success');
+        } else {
+            return array(
+                'state' => 'error',
+                'error' => $error);
+        } 
     }
 
-    return $response;
+    return array(
+        'state' => 'error',
+        'error' => array( 'parameters' => 'parameter missing') );
 }
 
 function eca_registration_status( WP_REST_Request $request) {
@@ -170,6 +176,16 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
 
     $status = 'delayed_expiration';
     $value = 0;
+
+    if(empty($error) && !empty($json['data']['anmelden']['anmeldeID'])) {
+        $id = $json['data']['anmelden']['anmeldeID'];
+
+        if(is_string($id)) {
+            eca_set_anmelde_id_form_api($token, $id);
+        } else {
+            $error['json'] = 'anmeldeId not string';
+        }
+    }
 
     if(empty($error) && is_integer($json['data']['anmelden']['status'])) {
         $r = $json['data']['anmelden']['status'];

@@ -24,6 +24,7 @@ function eca_registration_setup_db()
         event_id mediumint(9) DEFAULT -1 NOT NULL,
         data_as_json text DEFAULT '' NOT NULL,
         status text DEFAULT '' NOT NULL,
+        api_anmelde_id text DEFAULT '' NOT NULL,
         PRIMARY KEY  (anmelde_id)
     ) " . $charset_collate . ";";
 
@@ -98,7 +99,8 @@ function eca_add_registration($event_id, $data, $token)
                 'expire_at' => $expiration->format('Y-m-d H:i:s'),
                 'event_id' => $event_id,
                 'status' => 'waiting_for_confirmation',
-                'data_as_json' => json_encode($data)
+                'data_as_json' => json_encode($data),
+                'api_anmelde_id' => '',
             )
         );
     }
@@ -169,13 +171,29 @@ function eca_update_registration_status($token = '', $status = '') {
     $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
 
     if( !empty($token) && !empty($status) ) {
-            $wpdb->update(
-                $anmelde_table,
-                array('status' => $status),
-                array('token' => $token),
-                '%s',
-                '%s'
-            );
+        $wpdb->update(
+            $anmelde_table,
+            array('status' => $status),
+            array('token' => $token),
+            '%s',
+            '%s'
+        );
+    }
+}
+
+function eca_set_anmelde_id_form_api($token = '', $anmelde_id= '') {
+    global $wpdb;
+
+    $anmelde_table = $wpdb->prefix . ECA_ANMELDUNG_TABLE;
+
+    if( !empty($token) && !empty($anmelde_id) ) {
+        $wpdb->update(
+            $anmelde_table,
+            array('api_anmelde_id' => $anmelde_id),
+            array('token' => $token),
+            '%s',
+            '%s'
+        );
     }
 }
 
