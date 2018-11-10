@@ -65,9 +65,6 @@ function start() {
               },
             ],
             row: true,
-            rules: [
-              v => (!!v || v === '') || 'Bitte Geschlecht auswählen',
-            ],
           },
           {
             name: 'vorname',
@@ -76,6 +73,9 @@ function start() {
             required: true,
             counter: true,
             maxlength: 50,
+            rules: [
+              v=>v?true:'Bitte einen Vornamen angeben'
+            ]
           },
           {
             name: 'nachname',
@@ -84,6 +84,9 @@ function start() {
             required: true,
             counter: true,
             maxlength: 50,
+            rules: [
+              v=>v?true:'Bitte einen Nachnamen angeben'
+            ]
           },
           {
             name: 'gebDat',
@@ -91,6 +94,9 @@ function start() {
             type: 'string',
             required: true,
             component: 'ec-date',
+            rules: [
+              v=>v?true:'Bitte ein Geburtsdatum angeben'
+            ]
           },
         ],
       },
@@ -105,6 +111,9 @@ function start() {
             required: true,
             counter: true,
             maxlength: 20,
+            rules: [
+              v=>v?true:'Bitte eine Telefonnummer angeben'
+            ]
           },
           {
             name: 'email',
@@ -113,6 +122,9 @@ function start() {
             required: true,
             counter: true,
             maxlength: 20,
+            rules: [
+              v=>v?true:'Bitte eine E-Mail-Adresse angeben'
+            ]
           },
           {
             name: 'strasse',
@@ -121,6 +133,9 @@ function start() {
             counter: true,
             maxlength: 50,
             required: true,
+            rules: [
+              v=>v?true:'Bitte eine Strasse angeben'
+            ]
           },
           {
             name: 'plz',
@@ -129,6 +144,10 @@ function start() {
             counter: true,
             maxlength: 5,
             required: true,
+            rules: [
+              v=>v?true:'Bitte eine PLZ angeben',
+              v=>(v&&v.length===5)?true:'Bitte eine PLZ angeben, die genau 5 Zeichen lang ist.'
+            ]
           },
           {
             name: 'ort',
@@ -137,6 +156,9 @@ function start() {
             counter: true,
             maxlength: 50,
             required: true,
+            rules: [
+              v=>v?true:'Bitte einen Ort angeben'
+            ]
           },
         ],
       },
@@ -186,7 +208,7 @@ function start() {
             name: 'schwimmen',
             label: 'Schwimmen',
             type: 'boolean',
-            component: 'ec-checkbox',
+            component: 'ec-schwimmen',
           },
           {
             name: 'rad',
@@ -224,6 +246,9 @@ function start() {
             label: 'Ich erkenne die Teilnahmebedingungen für Freizeiten an und melde mich hiermit verbindlich an. (ggf. Einverständnis des Erziehungsberechtigten)',
             type: 'boolean',
             component: 'ec-checkbox',
+            rules: [
+              v=>v?true:'Die Akzeptierung der Teilnahmebedingungen ist notwendig.'
+            ]
           },
           {
             name: 'agrees_datenschutz',
@@ -231,6 +256,9 @@ function start() {
             label: 'Ich bin damit Einverstanden, dass die eingegeben Daten (vorerst) für bis zu 48 Stunden gespeichert werden. Während dieser Zeit hat niemand Zugriff auf diese Daten. Ich erhalte eine E-Mail mit weiteren Informationen zum Datenschutz die ich bestätigen muss bevor die Anmeldung weiterverarbeitet wird. Als Anmeldezeitpunkt für die Warteliste etc. wird der Zeitpunkt der Bestätigung angenommen. Nach 48 Stunden ohne Bestätigung wird die Anmeldung gelöscht.',
             type: 'boolean',
             component: 'ec-checkbox',
+            rules: [
+              v=>v?true:'Die Akzeptierung der Datenschutzbedingungen ist notwendig.'
+            ]
           },
           {
             name: 'agrees_fahrgemeinschaften',

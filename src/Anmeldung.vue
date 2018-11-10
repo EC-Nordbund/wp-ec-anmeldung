@@ -1,33 +1,30 @@
 <template>
   <v-app>
+    <v-toolbar color="primary">
+      <v-spacer/>
+        <h1 color="white">
+          Anmeldung zu Veranstaltung: {{event.title}}
+        </h1>
+      <v-spacer/>
+    </v-toolbar>
 
-    
-    
-      <v-toolbar color="primary">
-        <v-spacer/>
-          <h1 color="white">
-            Anmeldung zu Veranstaltung: {{event.title}}
-          </h1>
-        <v-spacer/>
-      </v-toolbar>
-
-      <ec-countdown v-if="countdown" :until="event.start"/>
+    <ec-countdown v-if="countdown" :until="event.start"/>
       
-      <template v-else>
+    <template v-else>
 
       <v-content>
         <v-stepper v-model="currentStep" vertical non-linear>
-            <template v-for="(step, index) in form.steps">
+          <template v-for="(step, index) in form.steps">
 
-              <v-stepper-step  :step="index+1" :key="'s' + index" editable>
-                {{step.title}}
-                <small>{{step.hint}}</small>
-              </v-stepper-step>
+            <v-stepper-step :step="index+1" :key="'s' + index" editable>
+              {{step.title}}
+              <small>{{step.hint}}</small>
+            </v-stepper-step>
 
             <v-stepper-content :key="'c'+index" :step="index + 1">
               <v-card>
                 <v-card-text>
-                  <v-form>
+                  <v-form v-model="valid[index]">
                     <ec-form-element 
                       v-for="field in step.fields" 
                       :field="field" 
@@ -38,12 +35,11 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer/>
-                  <v-btn v-if="currentStep < form.steps.length" @click="currentStep++">Weiter</v-btn>
+                  <v-btn :disabled="!valid[index]" v-if="currentStep < form.steps.length" @click="currentStep++">Weiter</v-btn>
                   <v-btn v-else @click="printData()">Absenden</v-btn>
                 </v-card-actions>
               </v-card>
             </v-stepper-content>
-          
           </template>
         </v-stepper>
       </v-content>
@@ -86,6 +82,8 @@ export default class Anmeldung extends Vue {
   public data: { [name: string]: boolean | number | string } = {};
 
   public countdown: boolean = false;
+
+  public valid: any = {}
 
   get timeDiff() {
     const now = new Date().getTime();
