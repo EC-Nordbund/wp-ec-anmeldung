@@ -121,13 +121,32 @@ function eca_get_value_of_key_r($key, $array) {
     return $result; // key not in array
 }
 
+function eca_success_mail_values($event_id = -1, $data) {
+    $val = array();
+
+    if(!empty($data['vorname'])) {
+        $var['vorname'] = $data['vorname'];
+    }
+
+    if(!empty($data['nachname'])) {
+        $var['nachname'] = $data['nachname'];
+    }
+
+    $var['eid'] = $event_id;
+
+    if(!empty($data['email'])) {
+        $var['to'] = $data['email'];
+    }
+
+    return $val;
+}
+
 function eca_registration_send_to_server($token, $event_id, $data, $created) {
     $error = array();
 
-    $api_event_id = eca_event_id_mapping($event_id);
+    $mail = eca_success_mail_values($event_id, $data);
 
-    // TODO: entfernen
-    $api_event_id = 4200;
+    $api_event_id = eca_event_id_mapping($event_id);
 
     $valid = eca_check_required_fields($api_event_id, $date);
 
@@ -205,6 +224,7 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
             // Successful
             case 0:
                 $status = 'successful_registered';
+                eca_success_mail($mail['to'] , $mail['eid'], $mail['vorname'], $mail['nachname']);
                 break;
 
             default:

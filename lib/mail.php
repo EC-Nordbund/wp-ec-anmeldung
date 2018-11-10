@@ -2,12 +2,31 @@
 
 if (!defined('ABSPATH')) exit;
 
+function eca_success_mail($to = '', $event_id = -1, $vorname = '', $nachname = '') {
+    $headers[] = 'From: EC-Nordbund <noreply@ec-nordbund.de>';
+    $headers[] = 'Reply-To: Referent <referent@ec-nordbund.de>';
+    $headers[] = 'Content-Type: text/plain';
+
+    $subject = 'Deine Anmeldung war erfolgreich';
+
+    $to = eca_mail_to_wrapper($to, array(
+        'vorname' => $vorname,
+        'nachname' => $nachname));
+
+    $event = eca_get_event_data($event_id);
+    $event_title = $event['title'];
+
+    // TODO: ...
+    wp_mail($to, $subject, 'Test' , $headers);
+
+}
+
 function eca_confirmation_mail($to = '', $event_id = -1, $token = 'no_token', $data = array(), $schema = array()) {
 
     $error = $responce = array();
 
     $headers[] = 'From: EC-Nordbund <noreply@ec-nordbund.de>';
-    // $headers[] = 'Bcc: webmaster@ec-nordbund.de';
+    $headers[] = 'Bcc: webmaster@ec-nordbund.de';
     $headers[] = 'Reply-To: Referent <referent@ec-nordbund.de>';
     $headers[] = 'Content-Type: text/html';
 
