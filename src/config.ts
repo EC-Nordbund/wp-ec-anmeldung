@@ -10,6 +10,7 @@ export interface Step {
   title: string;
   hint?: string;
   conditions?: Conditions;
+  rules?: Array<(stepperVal:any)=>boolean>
   fields: Field[];
 }
 
