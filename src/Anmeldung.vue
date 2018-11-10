@@ -1,26 +1,7 @@
 <template>
-<<<<<<< HEAD
       <v-content fluid full-width fill-height>
         <v-stepper v-model="currentStep" vertical non-linear>
             <template v-for="(step, index) in form.steps">
-=======
-  <v-app>
-    <v-toolbar color="primary">
-      <v-spacer/>
-        <h1 color="white">
-          Anmeldung zu Veranstaltung: {{event.title}}
-        </h1>
-      <v-spacer/>
-    </v-toolbar>
-
-    <ec-countdown v-if="countdown" :until="event.start"/>
-      
-    <template v-else>
-
-      <v-content>
-        <v-stepper v-model="currentStep" vertical>
-          <template v-for="(step, index) in form.steps">
->>>>>>> validation
 
             <v-stepper-step :rules="(step.rules||[]).map(v=>(()=>visited.indexOf(index+1)===-1||v(data)))" :step="index+1" :key="'s' + index" editable>
               {{step.title}}
@@ -92,8 +73,6 @@ export default class Anmeldung extends Vue {
   public schema: { [name:string]: Array<string> } = {}
   public data: { [name: string]: boolean | number | string } = {};
 
-<<<<<<< HEAD
-=======
   public countdown: boolean = false;
 
   public valid: any = {}
@@ -108,7 +87,6 @@ export default class Anmeldung extends Vue {
     
     return then - now;
   }
->>>>>>> validation
 
   public printData() {
     console.log(this.data);
