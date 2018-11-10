@@ -145,9 +145,10 @@ export default class Anmeldung extends Vue {
       })
       .then(res=>res.data)
       .then(res => {
+        console.log(res)
         if(res.state=="success"){
           alert('Daten wurden erfolgreich übermittelt...')
-          location.href="https://ec-nordbnd.de"
+          location.href="https://ec-nordbund.de"
         } else {
           throw ''
         }

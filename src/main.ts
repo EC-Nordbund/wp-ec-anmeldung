@@ -117,6 +117,7 @@ function start() {
             required: true,
             counter: true,
             maxlength: 20,
+            mask: '####################',
             rules: [
               v=>v?true:'Bitte eine Telefonnummer angeben'
             ]
@@ -150,6 +151,7 @@ function start() {
             counter: true,
             maxlength: 5,
             required: true,
+            mask: '#####',
             rules: [
               v=>v?true:'Bitte eine PLZ angeben',
               v=>(v&&typeof v === 'string'&&v.length===5)?true:'Bitte eine PLZ angeben, die genau 5 Zeichen lang ist.'
