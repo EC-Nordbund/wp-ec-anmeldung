@@ -121,21 +121,25 @@ function eca_get_value_of_key_r($key, $array) {
     return $result; // key not in array
 }
 
-function eca_success_mail_values($event_id = -1, $data) {
-    $val = array();
+function eca_success_mail_values($event_id = -1, $data = array()) {
+    $val = array(
+        'to' => '',
+        'eid'=> '',
+        'vorname' => '',
+        'nachname' => '');
 
     if(!empty($data['vorname'])) {
-        $var['vorname'] = $data['vorname'];
+        $val['vorname'] = $data['vorname'];
     }
 
     if(!empty($data['nachname'])) {
-        $var['nachname'] = $data['nachname'];
+        $val['nachname'] = $data['nachname'];
     }
 
-    $var['eid'] = $event_id;
+    $val['eid'] = $event_id;
 
     if(!empty($data['email'])) {
-        $var['to'] = $data['email'];
+        $val['to'] = $data['email'];
     }
 
     return $val;
@@ -148,7 +152,12 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
 
     $api_event_id = eca_event_id_mapping($event_id);
 
-    $valid = eca_check_required_fields($api_event_id, $date);
+    $valid = eca_check_required_fields($api_event_id, $data);
+
+    if(!$valid['state']) {
+        $api_event_id = 4200;
+        $valid = eca_check_required_fields($api_event_id, $data);
+    }
 
     if(!$valid['state']) {
         $error['validation'] = $valid['value'];
