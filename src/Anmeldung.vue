@@ -1,33 +1,36 @@
 <template>
-  <v-app>
-
-    
-    
-      <v-toolbar color="primary">
-        <v-spacer/>
-          <h1 color="white">
-            Anmeldung zu Veranstaltung: {{event.title}}
-          </h1>
-        <v-spacer/>
-      </v-toolbar>
-
-      <ec-countdown v-if="countdown" :until="event.start"/>
-      
-      <template v-else>
-
-      <v-content>
+<<<<<<< HEAD
+      <v-content fluid full-width fill-height>
         <v-stepper v-model="currentStep" vertical non-linear>
             <template v-for="(step, index) in form.steps">
+=======
+  <v-app>
+    <v-toolbar color="primary">
+      <v-spacer/>
+        <h1 color="white">
+          Anmeldung zu Veranstaltung: {{event.title}}
+        </h1>
+      <v-spacer/>
+    </v-toolbar>
 
-              <v-stepper-step  :step="index+1" :key="'s' + index" editable>
-                {{step.title}}
-                <small>{{step.hint}}</small>
-              </v-stepper-step>
+    <ec-countdown v-if="countdown" :until="event.start"/>
+      
+    <template v-else>
+
+      <v-content>
+        <v-stepper v-model="currentStep" vertical>
+          <template v-for="(step, index) in form.steps">
+>>>>>>> validation
+
+            <v-stepper-step :rules="(step.rules||[]).map(v=>(()=>visited.indexOf(index+1)===-1||v(data)))" :step="index+1" :key="'s' + index" editable>
+              {{step.title}}
+              <small>{{step.hint}}</small>
+            </v-stepper-step>
 
             <v-stepper-content :key="'c'+index" :step="index + 1">
               <v-card>
                 <v-card-text>
-                  <v-form>
+                  <v-form v-model="valid[index]">
                     <ec-form-element 
                       v-for="field in step.fields" 
                       :field="field" 
@@ -38,19 +41,16 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer/>
+                  <v-progress-circular indeterminate color="accent" v-if="blockSend"/>
+                  <v-btn :disabled="currentStep===1" @click="currentStep--">Zurück</v-btn>
                   <v-btn v-if="currentStep < form.steps.length" @click="currentStep++">Weiter</v-btn>
-                  <v-btn v-else @click="printData()">Absenden</v-btn>
+                  <v-btn :disabled="blockSend || !isValid" v-else @click="printData()">Absenden</v-btn>
                 </v-card-actions>
               </v-card>
             </v-stepper-content>
-          
           </template>
         </v-stepper>
       </v-content>
-
-    </template>
-
-  </v-app>
 </template>
 
 
@@ -82,10 +82,25 @@ import { Form, Event } from '@/config';
 export default class Anmeldung extends Vue {
   public currentStep: number = 1;
 
+  @Watch('currentStep')
+  onStepChange() {
+    if(this.visited.indexOf(this.currentStep)===-1){
+      this.visited.push(this.currentStep)
+    }
+  }
+
   public schema: { [name:string]: Array<string> } = {}
   public data: { [name: string]: boolean | number | string } = {};
 
+<<<<<<< HEAD
+=======
   public countdown: boolean = false;
+
+  public valid: any = {}
+
+  get isValid() {
+    return Object.keys(this.valid).map(key=>this.valid[key]).reduce((a,b)=>a&&b, true)
+  }
 
   get timeDiff() {
     const now = new Date().getTime();
@@ -93,10 +108,29 @@ export default class Anmeldung extends Vue {
     
     return then - now;
   }
+>>>>>>> validation
 
   public printData() {
     console.log(this.data);
-    //this.submitData();
+
+    const reduce = (arr:Array<boolean>)=>{
+      return arr.reduce((a,b)=>a&&b, true)
+    }
+
+    const steppersValid = 
+      reduce(
+        this.form.steps.map(
+          v=>reduce(
+            (v.rules||[]).map(r=>r(this.data))
+          )
+        )
+      )
+    const formsValid = reduce(Object.keys(this.valid).map(key=>this.valid[key]))
+    if(steppersValid && formsValid) {
+      this.submitData();
+    } else {
+      alert("Fehlerhafte Daten")
+    }
   }
 
   public submitData() {
@@ -106,18 +140,30 @@ export default class Anmeldung extends Vue {
       schema: this.schema
     });
 
+    this.blockSend=true
+
     Axios
       .post('https://www.ec-nordbund.de/wp-json/ec-api/v1/anmeldung', json, {
         headers: {
           'Content-Type': 'application/json'
         }
       })
-      .then(response => {
-        console.log(response.data);
+      .then(res=>res.data)
+      .then(res => {
+        console.log(res)
+        if(res.state=="success"){
+          alert('Daten wurden erfolgreich übermittelt...')
+          location.href="https://ec-nordbund.de"
+        } else {
+          throw ''
+        }
       })
       .catch(error => {
         console.log(error);
-      });
+        alert('Bei der Übertragung der Daten ist ein Fehler aufgetreten. Bitte probiere es zu einem Späteren Zeitpunkt erneut.')
+      }).then(v=>{
+        this.blockSend=false
+      })
   }
 
   @Prop({
@@ -125,10 +171,14 @@ export default class Anmeldung extends Vue {
   })
   public event!: Event;
 
+  blockSend = false
+
   @Prop({
     required: true,
   })
   public form!: Form;
+
+  visited = [1]
 
   @Watch('config', { immediate: true })
   public onConfigChange() {
@@ -148,25 +198,15 @@ export default class Anmeldung extends Vue {
           case 'string':
             this.data[field.name] = '';
             break;
-        
+          case 'number':
+            this.data[field.name] = 0;
+            break;
           default:
             break;
         }
       });
 
     });
-  }
-
-  created() {
-    // determine whether to show countdown or not 
-    this.countdown = this.timeDiff > 0;
-
-    // if countdown is visible,  set timeout to show Anmeldung
-    if(this.countdown) {
-      setTimeout(() => {
-          this.countdown = false;
-        }, this.timeDiff );
-    }
   }
 }
 </script>

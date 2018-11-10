@@ -1,5 +1,5 @@
 <template>
-  <v-menu
+  <v-dialog
     ref="menu"
     :close-on-content-click="false"
     v-model="menu"
@@ -8,14 +8,14 @@
     offset-y
     lazy
     full-width
-    min-width="290px"
+    width="290px"
   >
     <v-text-field
       slot="activator"
       readonly
       v-model="german"
-      prepend-icon="mdi-event"
       v-bind="$attrs"
+      @blur="menu = true"
     />
     <v-date-picker
     v-model="date"
@@ -25,7 +25,7 @@
     @change="save"
     locale="de-de">
     </v-date-picker>
-  </v-menu>
+  </v-dialog>
 </template>
 
 <script lang="ts">
@@ -53,8 +53,7 @@ export default class DatePicker extends Vue {
 
   @Watch('menu')
   onDialogOpenChange(val: boolean) {
-    return val;
-    // TODO: return val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'));
+    return val && this.$nextTick(() => ((this.$refs.picker as any).activePicker = 'YEAR'));
   }
 
 
