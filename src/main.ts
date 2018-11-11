@@ -24,7 +24,6 @@ const init = (
   id: string,
   event: Event,
   form: Form,
-  sendHoock: (data: Array<{ [key: string]: string | number | boolean }>) => void,
 ) => {
   return new Vue({
     render: (h) => h(Dialog, { props: { form, event }}),
@@ -32,10 +31,9 @@ const init = (
 };
 (window as any).createAnmeldung = init;
 
-start();
+// start();
 
 function start() {
-
 
   return init('anmeldung', {
     id: 4200,
@@ -290,5 +288,5 @@ function start() {
         ],
       },
     ],
-  }, console.log);
+  });
 }

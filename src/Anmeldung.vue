@@ -27,8 +27,8 @@
                     />
                   </v-form>
 
-                  <v-alert :value="success && currentStep >= form.step.length" type="success">Daten wurden erfolgreich übermittelt!</v-alert>
-                  <v-alert :value="error && currentStep >= form.step.length" type="error">Daten wurden erfolgreich übermittelt!</v-alert>
+                  <v-alert :value="success && currentStep >= form.steps.length" type="success">Daten wurden erfolgreich übermittelt!</v-alert>
+                  <v-alert :value="error && currentStep >= form.steps.length" type="error">Fehler bei der übermittling deiner Daten. Versuche es später noch einmal</v-alert>
 
                 </v-card-text>
 
@@ -36,7 +36,11 @@
                   <v-spacer/>
                   <v-btn v-if="currentStep > 1" @click="currentStep--">Zurück</v-btn>
                   <v-btn v-if="currentStep < form.steps.length" @click="nextStep(step, index)">Weiter</v-btn>
-                  <v-btn :disabled="success || !everythingValid" v-else @click="submitData()">Absenden<v-progress-circular indeterminate v-if="loading" dark/></v-btn>
+                  <v-btn
+                    v-else
+                    :disabled="success || !everythingValid"
+                    color="primary"
+                    @click="submitData()">Absenden<v-progress-circular indeterminate v-if="loading" dark/></v-btn>
                 </v-card-actions>
               </v-card>
             </v-stepper-content>
@@ -84,13 +88,13 @@ export default class Anmeldung extends Vue {
 
   private valid: boolean[] = [];
     
-  private schema: { [name:string]: Array<string> } = {};
+  private schema: { [name:string]: Array<{ [name: string]: string }> } = {};
   private data: { [name: string]: boolean | number | string } = {};
 
   private nextStep(step: Step, index: number) {
-    if(!!this.form.steps[index+1].skip_ü18) {
+    // if(!!this.form.steps[index+1].skip_ü18) {
       //TODO: 18+
-    }
+    // }
 
     if(this.stepperValid(step)) {
       this.currentStep++;
@@ -148,14 +152,11 @@ export default class Anmeldung extends Vue {
 
           // successful transmitted
           this.success = data.state === "success";
+          this.error = !this.success;
 
-          if(!this.success) {
-            this.error = true;
-          }
         })
         .catch(error => {
           this.error = true;
-          //alert('Bei der Übertragung der Daten ist ein Fehler aufgetreten. Bitte probiere es zu einem Späteren Zeitpunkt erneut.')
         });
     } else {
       this.error = true;
@@ -190,7 +191,9 @@ export default class Anmeldung extends Vue {
 
     // set init values    
     this.form.steps.forEach((step) => {
-      this.schema[step.title] = step.fields.map((f) => f.name);
+      this.schema[step.title] = step.fields.map((f) => {
+        return { name: f.name, lable: f.label };
+      });
 
       step.fields.forEach((field) => {
         switch (field.type) {

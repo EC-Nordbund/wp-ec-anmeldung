@@ -233,14 +233,18 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
             // Successful
             case 0:
                 $status = 'successful_registered';
-                eca_success_mail($mail['to'] , $mail['eid'], $mail['vorname'], $mail['nachname']);
+
+                // Final Mail
+                eca_final_mail($mail['to'] , $mail['eid'], $mail['vorname'], $mail['nachname']);
                 break;
 
             default:
                 if(is_int($r) && $r > 0) {
                     $status = 'waitingqueue';
                     $value = $r;
-                    // TODO: Warteliste Mail
+
+                    // Final Mail
+                    eca_final_mail($mail['to'] , $mail['eid'], $mail['vorname'], $mail['nachname'], $r);
                 } 
                 break;
         }
