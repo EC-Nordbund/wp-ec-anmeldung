@@ -32,7 +32,7 @@ const init = (
 };
 (window as any).createAnmeldung = init;
 
-// start();
+start();
 
 function start() {
 
@@ -48,7 +48,13 @@ function start() {
         name: 'person',
         title: 'Persöhnliche Daten',
         rules: [
-          v=>v.geschlecht&&v.vorname&&v.vorname.length > 0 && v.nachname && v.nachname.length > 0 && v.gebDat && v.gebDat.length > 0
+          (v) => v.geschlecht,
+          (v) => v.vorname,
+          (v) => v.vorname.length > 0,
+          (v) => v.nachname,
+          (v) => v.nachname.length > 0,
+          (v) => v.gebDat,
+          (v) => v.gebDat.length > 0,
         ],
         fields: [
           {
@@ -56,7 +62,7 @@ function start() {
             label: '',
             component: 'ec-radio',
             type: 'string',
-            required: true,
+            mandatory: true,
             values: [
               {
                 label: 'männlich',
@@ -128,7 +134,7 @@ function start() {
             type: 'string',
             required: true,
             counter: true,
-            maxlength: 20,
+            maxlength: 50,
             rules: [
               v=>v?true:'Bitte eine E-Mail-Adresse angeben'
             ]
@@ -176,14 +182,10 @@ function start() {
         fields: [
           {
             name: 'vegetarisch',
-            label: 'Verplegung:',
+            label: 'Ich möchte vegetarisches Essen',
             required: true,
             type: 'boolean',
-            component: 'v-select',
-            items: [
-              { text: 'normal', value: false, },
-              { text: 'vegetarisch', value: true },
-            ],
+            component: 'v-checkbox',
           },
           {
             name: 'lebensmittel',
@@ -204,11 +206,12 @@ function start() {
       },
       {
         name: 'permissions',
-        title: 'Erlaubnisse',
+        title: 'Erlaubnisse eines zuständigen Erziehungsberechtigten',
+        conditions: { hideOnOlderThan18: true },
         fields: [
           {
             name: '',
-            label: 'Mein Sohn/Meine Tochter darf:',
+            label: 'Ich erlaube dem Teilnehmer...',
             type: 'none',
             component: 'ec-label',
           },
@@ -248,26 +251,39 @@ function start() {
         name: 'agreements',
         title: 'Datenschutz & Teilnahmebedingungen',
         rules: [
-          v=>v.agrees_teilnehmer_bedingung&&v.agrees_datenschutz
+          (v) => v.agrees_teilnehmer_bedingung,
+          (v) => v.agrees_datenschutz,
         ],
         fields: [
           {
             name: 'agrees_teilnehmer_bedingung',
-            required: true,
+            required: true, 
             label: 'Ich erkenne die Teilnahmebedingungen für Freizeiten an und melde mich hiermit verbindlich an. (ggf. Einverständnis des Erziehungsberechtigten)',
             type: 'boolean',
-            component: 'ec-checkbox'
+            rules: [
+              (v) => v?true:'Diese Zustimmung ist erforderlich',
+            ],
+            component: 'ec-checkbox',
           },
           {
             name: 'agrees_datenschutz',
             required: true,
-            label: 'Ich bin damit Einverstanden, dass die eingegeben Daten (vorerst) für bis zu 24 Stunden gespeichert werden. Während dieser Zeit hat niemand Zugriff auf diese Daten. Ich erhalte eine E-Mail mit weiteren Informationen zum Datenschutz die ich bestätigen muss bevor die Anmeldung weiterverarbeitet wird. Als Anmeldezeitpunkt für die Warteliste etc. wird der Zeitpunkt der Bestätigung angenommen. Nach 24 Stunden ohne Bestätigung wird die Anmeldung gelöscht.',
+            label: 'Ich bin damit Einverstanden, dass meine eingegeben Daten für 24 Stunden zwischengespeichert werden und mir einem E-Mail zu bestätigen der Anmeldung zugeschickt wird.',
             type: 'boolean',
-            component: 'ec-checkbox'
+            rules: [
+              (v) => v?true:'Diese Zustimmung ist erforderlich',
+            ],
+            component: 'ec-checkbox',
+          },
+          {
+            name: '',
+            label: 'Optional:',
+            type: 'none',
+            component: 'ec-label',
           },
           {
             name: 'agrees_fahrgemeinschaften',
-            label: 'Hiermit willige ich ein, dass meine Anschrift zum Zweck der Bildung von Fahrgemeinschaften bei der Organisation der An- und/oder Abreise an die anderen Teilnehmer der Reisegruppe weitergegeben werden darf. Die Erteilung der Einwilligung ist freiwillig.',
+            label: 'Ich erkläre mich bereit meine Anschrift zum Zweck der Bildung von Fahrgemeinschaften an die anderen Teilnehmer weitergegeben werden dürfen.',
             type: 'boolean',
             component: 'ec-checkbox',
           },

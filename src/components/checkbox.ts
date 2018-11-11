@@ -41,7 +41,7 @@ export default class ecCheckbox extends Vue {
       },
       on: {
         change: (val: boolean) => {
-          this.intern_value = val;
+          this.intern_value = !!val;
         },
       },
     });

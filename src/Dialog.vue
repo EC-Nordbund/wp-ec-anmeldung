@@ -72,9 +72,20 @@ export default class Dialog extends Vue {
     onDialogChange(open: boolean) {
         var headers: any = window.document.getElementsByClassName('header');
 
-        for (let i = 0; i < headers.length; i++) {
-            let header = headers[i];
-            header.style.display = open ? 'none' : 'inherit';
+        if(!!headers) {
+            for (let i = 0; i < headers.length||0; i++) {
+                let header = headers[i];
+                header.style.display = open ? 'none' : 'inherit';
+            }
+        }
+
+        var maps: any = window.document.getElementById('ec-loc-map');
+
+        if(!!maps) {
+            for (let i = 0; i < maps.length||0; i++) {
+                let map = maps[i];
+                maps.style.display = open ? 'none' : 'inherit';
+            }
         }
     }
 
