@@ -207,7 +207,7 @@ function start() {
       {
         name: 'permissions',
         title: 'Erlaubnisse eines zuständigen Erziehungsberechtigten',
-        conditions: { hideOnOlderThan18: true },
+        skip_ü18: true,
         fields: [
           {
             name: '',
