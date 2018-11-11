@@ -379,7 +379,7 @@ function eca_registration_prepare_graphql_mutation($event_id, $data, $created) {
 
 
     $existing_known_extra_fields = array_filter($known_extra_fields, function($key) {
-        return isset($data[$key])
+        return isset($data[$key]);
     });
 
     $extra_fields = array_map(function($key) {
