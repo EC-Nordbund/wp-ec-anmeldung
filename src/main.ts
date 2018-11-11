@@ -1,203 +1,292 @@
 import Vue from 'vue';
 import './plugins/vuetify.js';
-import Anmeldung from './anmeldungsRoot.vue';
-// import router from './router'
+import Dialog from './Dialog.vue';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
 
-import { IConfig } from './config';
-import formElement from '@/plugins/formComponent';
-import radio from '@/components/radio'
-import datePicker from '@/components/date.vue'
-import schwimmen from "@/components/schwimmen.vue";
-import label from "@/components/label.vue";
+import { Form, Event } from './config';
+import formElement from '@/components/formComponent';
+import radio from '@/components/radio';
+import datePicker from '@/components/date.vue';
+import schwimmen from '@/components/schwimmen.vue';
+import label from '@/components/label.vue';
 
 Vue.config.productionTip = false;
 
 Vue.component('ec-form-element', formElement);
-Vue.component('ec-radio', radio)
-Vue.component('ec-date', datePicker)
-Vue.component('ec-schwimmen', schwimmen)
-Vue.component('ec-label', label)
+Vue.component('ec-radio', radio);
+Vue.component('ec-date', datePicker);
+Vue.component('ec-schwimmen', schwimmen);
+Vue.component('ec-label', label);
 
 
 const init = (
   id: string,
-  config: IConfig,
-  sendHoock: (data: Array<{ [key: string]: string | number | boolean }>) => void,
+  event: Event,
+  form: Form,
 ) => {
   return new Vue({
-    // router: router(config),
-    render: (h) => h(Anmeldung, { props: { config }, on: { sended: sendHoock } }),
+    render: (h) => h(Dialog, { props: { form, event }}),
   }).$mount('#' + id);
-}
-; (window as any).createAnmeldung = init;
+};
+(window as any).createAnmeldung = init;
 
+// start();
 
-init('app', {
-  vConfig: {
-    veranstaltungsID: 1,
-    bezeichnung: 'Test',
-    begin: new Date(),
+function start() {
+
+  return init('anmeldung', {
+    id: 4200,
+    title: 'Test',
+    start: new Date('2018-11-10T12:51:00'),
   },
-  form: [
-    {
-      name: 'pers',
-      title: 'Persöhnliche Daten',
-      fields: [
-        {
-          name: 'geschlecht',
-          label: '',
-          componentName: 'ec-radio',
-          values: [
-            {
-              label: 'Männlich',
-              value: 'm'
-            },
-            {
-              label: 'Weiblich',
-              value: 'w'
-            }
-          ],
-          row: true
-        },
-        {
-          name: 'vorname',
-          label: 'Vorname',
-          counter: 50
-        },
-        {
-          name: 'nachname',
-          label: 'Nachname',
-          counter: 50
-        },
-        {
-          name: 'gebDat',
-          label: 'Geburtsdatum',
-          componentName: 'ec-date'
-        }
-      ],
-    },
-    {
-      name: 'kontakt',
-      title: 'Kontaktdaten',
-      fields: [
-        {
-          name: 'telefon',
-          label: 'Telefonnummer',
-          required: true,
-          counter: 20
-        },
-        {
-          name: 'email',
-          label: 'E-Mail',
-          required: true,
-          counter: 20
-        },
-        {
-          name: 'strasse',
-          label: 'Strasse',
-          counter: 50,
-          required: true
-        },
-        {
-          name: 'plz',
-          label: 'PLZ',
-          counter: 5,
-          required: true
-        },
-        {
-          name: 'ort',
-          label: 'Ort',
-          counter: 50,
-          required: true
-        }
-      ]
-    },
-    {
-      name: 'bem',
-      title: 'Bemerkungen',
-      fields: [
-        {
-          name: 'vegetarisch',
-          label: 'Ich bin Vegetarier!',
-          componentName: 'v-checkbox'
-        },
-        {
-          name: 'bemerkungen',
-          label: 'Bemerkungen',
-          componentName: 'v-textarea'
-        },
-        {
-          name: 'lebensmittel',
-          label: 'Lebensmittelunverträglichkeiten',
-          componentName: 'v-textarea'
-        },
-        {
-          name: 'gesundheitsinformationen',
-          label: 'Gesundheitsinformationen (was gibt es zu beachten, Krankheiten etc.)',
-          componentName: 'v-textarea'
-        }
-      ]
-    },
-    {
-      name: 'erl',
-      title: 'Erlaubnisse',
-      fields: [
-        {
-          name: 'schwimen',
-          label: '_',
-          componentName: 'ec-schwimmen'
-        },
-        {
-          name: '_',
-          label: 'Mein Sohn/Meine Tochter darf...',
-          componentName: 'ec-label'
-        },
-        {
-          name: 'rad',
-          label: 'Radfahren',
-          componentName: 'v-checkbox'
-        },
-        {
-          name: 'klettern',
-          label: 'Klettern',
-          componentName: 'v-checkbox'
-        },
-        {
-          name: 'boot',
-          label: 'Boot / Kanu fahren',
-          componentName: 'v-checkbox'
-        },
-        {
-          name: 'entfernen',
-          label: 'Sich in einer Gruppe von mindestens drei Personen eine begrenzte Zeit vom Camp entfernen / in die Stadt gehen',
-          componentName: 'v-checkbox'
-        }
-      ]
-    },
-    {
-      name: 'tnBed',
-      title: 'Datenschutz & Teilnahmebedingungen',
-      fields: [
-        {
-          name: 'tnBedingungen',
-          required: true,
-          label: 'Ich erkenne die Teilnahmebedingungen für Freizeiten an und melde mich hiermit verbindlich an. (ggf. Einverständnis des Erziehungsberechtigten)',
-          componentName: 'v-checkbox'
-        },
-        {
-          name: 'datenschutz',
-          required: true,
-          label: 'Ich bin damit Einverstanden, dass die eingegeben Daten (vorerst) für bis zu 48 Stunden gespeichert werden. Während dieser Zeit hat niemand Zugriff auf diese Daten. Ich erhalte eine E-Mail mit weiteren Informationen zum Datenschutz die ich bestätigen muss bevor die Anmeldung weiterverarbeitet wird. Als Anmeldezeitpunkt für die Warteliste etc. wird der Zeitpunkt der Bestätigung angenommen. Nach 48 Stunden ohne Bestätigung wird die Anmeldung gelöscht.',
-          componentName: 'v-checkbox'
-        },
-        {
-          name: 'fahrgemeinschaften',
-          label: 'Hiermit willige ich ein, dass meine Anschrift zum Zweck der Bildung von Fahrgemeinschaften bei der Organisation der An- und/oder Abreise an die anderen Teilnehmer der Reisegruppe weitergegeben werden darf. Die Erteilung der Einwilligung ist freiwillig.',
-          componentName: 'v-checkbox'
-        }
-      ]
-    }
-  ],
-}, console.log);
+  {
+    steps: [
+      {
+        name: 'person',
+        title: 'Persöhnliche Daten',
+        rules: [
+          (v) => v.geschlecht,
+          (v) => v.vorname,
+          (v) => v.vorname.length > 0,
+          (v) => v.nachname,
+          (v) => v.nachname.length > 0,
+          (v) => v.gebDat,
+          (v) => v.gebDat.length > 0,
+        ],
+        fields: [
+          {
+            name: 'geschlecht',
+            label: '',
+            component: 'ec-radio',
+            type: 'string',
+            mandatory: true,
+            values: [
+              {
+                label: 'männlich',
+                value: 'm',
+                },
+              {
+                label: 'weiblich',
+                value: 'w',
+              },
+            ],
+            row: true,
+          },
+          {
+            name: 'vorname',
+            label: 'Vorname',
+            type: 'string',
+            required: true,
+            counter: true,
+            maxlength: 50,
+            rules: [
+              v=>v?true:'Bitte einen Vornamen angeben'
+            ]
+          },
+          {
+            name: 'nachname',
+            label: 'Nachname',
+            type: 'string',
+            required: true,
+            counter: true,
+            maxlength: 50,
+            rules: [
+              v=>v?true:'Bitte einen Nachnamen angeben'
+            ]
+          },
+          {
+            name: 'gebDat',
+            label: 'Geburtsdatum',
+            type: 'string',
+            required: true,
+            component: 'ec-date',
+            rules: [
+              v=>v?true:'Bitte ein Geburtsdatum angeben'
+            ]
+          },
+        ],
+      },
+      {
+        name: 'kontakt',
+        title: 'Kontaktdaten',
+        rules: [
+          v=>v.telefon && v.telefon.length >0 && v.email && v.email.length > 0 && v.strasse && v.strasse.length > 0 && v.plz && v.plz.length === 5 && v.ort && v.ort.length > 0
+        ],
+        fields: [
+          {
+            name: 'telefon',
+            label: 'Telefonnummer',
+            type: 'string',
+            required: true,
+            counter: true,
+            maxlength: 20,
+            mask: '####################',
+            rules: [
+              v=>v?true:'Bitte eine Telefonnummer angeben'
+            ]
+          },
+          {
+            name: 'email',
+            label: 'E-Mail',
+            type: 'string',
+            required: true,
+            counter: true,
+            maxlength: 50,
+            rules: [
+              v=>v?true:'Bitte eine E-Mail-Adresse angeben'
+            ]
+          },
+          {
+            name: 'strasse',
+            label: 'Strasse',
+            type: 'string',
+            counter: true,
+            maxlength: 50,
+            required: true,
+            rules: [
+              v=>v?true:'Bitte eine Strasse angeben'
+            ]
+          },
+          {
+            name: 'plz',
+            label: 'PLZ',
+            type: 'string',
+            counter: true,
+            maxlength: 5,
+            required: true,
+            mask: '#####',
+            rules: [
+              v=>v?true:'Bitte eine PLZ angeben',
+              v=>(v&&typeof v === 'string'&&v.length===5)?true:'Bitte eine PLZ angeben, die genau 5 Zeichen lang ist.'
+            ]
+          },
+          {
+            name: 'ort',
+            label: 'Ort',
+            type: 'string',
+            counter: true,
+            maxlength: 50,
+            required: true,
+            rules: [
+              v=>v?true:'Bitte einen Ort angeben'
+            ]
+          },
+        ],
+      },
+      {
+        name: 'sonstiges',
+        title: 'Sonstiges',
+        fields: [
+          {
+            name: 'vegetarisch',
+            label: 'Ich möchte vegetarisches Essen',
+            required: true,
+            type: 'boolean',
+            component: 'v-checkbox',
+          },
+          {
+            name: 'lebensmittel',
+            label: 'Lebensmittelunverträglichkeiten',
+            type: 'string',
+            box: true,
+            component: 'v-textarea',
+          },
+          {
+            name: 'gesundheitsinformationen',
+            label: 'Gesundheitsinformationen',
+            placeholder: 'z.b. Allergien, Krankheiten etc.',
+            box: true,
+            type: 'string',
+            component: 'v-textarea',
+          }
+        ]
+      },
+      {
+        name: 'permissions',
+        title: 'Erlaubnisse eines zuständigen Erziehungsberechtigten',
+        skip_ü18: true,
+        fields: [
+          {
+            name: '',
+            label: 'Ich erlaube dem Teilnehmer...',
+            type: 'none',
+            component: 'ec-label',
+          },
+          {
+            name: 'schwimmen',
+            label: 'Schwimmen',
+            type: 'number',
+            component: 'ec-schwimmen',
+          },
+          {
+            name: 'rad',
+            label: 'Radfahren',
+            type: 'boolean',
+            component: 'ec-checkbox',
+          },
+          {
+            name: 'klettern',
+            label: 'Klettern',
+            type: 'boolean',
+            component: 'ec-checkbox',
+          },
+          {
+            name: 'boot',
+            label: 'Boot / Kanu fahren',
+            type: 'boolean',
+            component: 'ec-checkbox',
+          },
+          {
+            name: 'entfernen',
+            label: 'Sich in einer Gruppe von mindestens drei Personen eine begrenzte Zeit vom Camp entfernen / in die Stadt gehen',
+            type: 'boolean',
+            component: 'ec-checkbox',
+          },
+        ],
+      },
+      {
+        name: 'agreements',
+        title: 'Datenschutz & Teilnahmebedingungen',
+        rules: [
+          (v) => v.agrees_teilnehmer_bedingung,
+          (v) => v.agrees_datenschutz,
+        ],
+        fields: [
+          {
+            name: 'agrees_teilnehmer_bedingung',
+            required: true, 
+            label: 'Ich erkenne die Teilnahmebedingungen für Freizeiten an und melde mich hiermit verbindlich an. (ggf. Einverständnis des Erziehungsberechtigten)',
+            type: 'boolean',
+            rules: [
+              (v) => v?true:'Diese Zustimmung ist erforderlich',
+            ],
+            component: 'ec-checkbox',
+          },
+          {
+            name: 'agrees_datenschutz',
+            required: true,
+            label: 'Ich bin damit Einverstanden, dass meine eingegeben Daten für 24 Stunden zwischengespeichert werden und mir einem E-Mail zu bestätigen der Anmeldung zugeschickt wird.',
+            type: 'boolean',
+            rules: [
+              (v) => v?true:'Diese Zustimmung ist erforderlich',
+            ],
+            component: 'ec-checkbox',
+          },
+          {
+            name: '',
+            label: 'Optional:',
+            type: 'none',
+            component: 'ec-label',
+          },
+          {
+            name: 'agrees_fahrgemeinschaften',
+            label: 'Ich erkläre mich bereit meine Anschrift zum Zweck der Bildung von Fahrgemeinschaften an die anderen Teilnehmer weitergegeben werden dürfen.',
+            type: 'boolean',
+            component: 'ec-checkbox',
+          },
+        ],
+      },
+    ],
+  });
+}
