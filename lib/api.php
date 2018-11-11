@@ -350,6 +350,10 @@ function eca_registration_prepare_graphql_mutation($event_id, $data, $created) {
         $params['gesundheitsinformationen'] = $data['gesundheitsinformationen'];
     }
 
+    if(isset($date['bemerkungen'])) {
+        $params['bemerkungen'] = $data['bemerkungen'];
+    }
+
     if(isset($data['schwimmen'])) {
         $params['schwimmen'] = $data['schwimmen'];
     }

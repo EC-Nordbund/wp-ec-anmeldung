@@ -2,7 +2,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('ANMELDE_START', '2018-11-11T15:00:00');
+define('ANMELDE_START', 'Date.UTC(2018, 10, 11, 10, 0, 0, 0)');
 
 function eca_anmeldung_shortcode($atts) {
     
@@ -35,6 +35,10 @@ function eca_anmeldung_shortcode($atts) {
     $html  = "<noscript>";
     $html .= "<strong>We're sorry but vue-ec-anmeldung doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>";
     $html .= "</noscript>";
+
+    $html .= '<h3 style="color: #AC1636;">Es gibt zur Zeit Kompatiblitäts-Probleme mit einigen Browser</h3>';
+    $html .= '<p>Die mobile Nutzung der Anmeldung ist sehr ungewisst.<br/>';
+    $html .= 'Wir empfehlen Firefox oder Google Chrome über einen Desktop-PC zu nutzen</p>';
 
     $html .= '<style> .application--wrap { min-height: unset !important; } 
       .v-input--selection-controls { margin-top: unset !important; }
@@ -96,7 +100,7 @@ function eca_initialisation_script($event_id = -1, $event_name = '', $form_id = 
 
   $script = "<script> const init_event = {
     id: " . $event_id . ",
-    title: '" . $event_name . "', start: new Date('" . $start . "') };";
+    title: '" . $event_name . "', start: new Date(" . $start . ") };";
   
   $script .= file_get_contents( ECA_PLUGIN_DIR . '/lib/forms.js');
   
