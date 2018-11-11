@@ -3,16 +3,22 @@
         <v-stepper v-model="currentStep" vertical non-linear>
             <template v-for="(step, index) in form.steps">
 
-<!-- :rules="!stepperValid(index)" -->
-            <v-stepper-step :step="index+1" :key="'s' + index" :rules="(step.rules||[]).map(v => ()=>v(data) || !visited.includes(step.name))" editable>
-              {{step.title}}
-              <small>{{step.hint}}</small>
+            <v-stepper-step 
+              :step="index+1"
+              :key="'s' + index"
+              :rules="[v => stepperValid(step) || !visited.includes(step.name)]"
+              :complete="stepperValid(step) && visited.includes(step.name)"
+              :editable="visited.includes(step.name)"
+              >{{step.title}}
+
+              <small v-if="stepperValid(step) || !visited.includes(step.name)">{{step.hint}}</small>
+              <small v-else>Erforderliche Felder sind leer</small>
             </v-stepper-step>
 
             <v-stepper-content :key="'c'+index" :step="index + 1">
               <v-card>
                 <v-card-text>
-                  <v-form v-model="valid[index]">
+                  <v-form v-model="valid[index]" :ref="'form' + index">
                     <ec-form-element 
                       v-for="field in step.fields" 
                       :field="field" 
@@ -21,11 +27,12 @@
                     />
                   </v-form>
                 </v-card-text>
+
                 <v-card-actions>
                   <v-spacer/>
-                  <v-btn :disabled="currentStep===1" @click="currentStep--">Zurück</v-btn>
-                  <v-btn v-if="currentStep < form.steps.length" @click="currentStep++">Weiter</v-btn>
-                  <v-btn :disabled="blockSend || !isValid" v-else @click="validateBeforeSend()">Absenden<v-progress-circular indeterminate dark v-if="blockSend"/></v-btn>
+                  <v-btn v-if="currentStep > 1" @click="currentStep--">Zurück</v-btn>
+                  <v-btn v-if="currentStep < form.steps.length" @click="nextStep(step)">Weiter</v-btn>
+                  <v-btn :disabled="success || !everythingValid" v-else @click="submitData()">Absenden<v-progress-circular indeterminate v-if="loading" dark/></v-btn>
                 </v-card-actions>
               </v-card>
             </v-stepper-content>
@@ -61,34 +68,37 @@ import { Form, Event, Step } from '@/config';
 
 @Component({})
 export default class Anmeldung extends Vue {
-  private currentStep: number = 1;
+  private loading = false;
+  private success = false;
+  private error = false;
+  private currIsValid = false;
 
+  private currentStep: number = 1;
   private visited: string[] = [];
 
+  private countdown: boolean = false;
 
-  @Watch('currentStep')
-  onStepChange(curr: number, prev: number) {
-    const step = this.form.steps[prev-1];
+  private valid: boolean[] = [];
+    
+  private schema: { [name:string]: Array<string> } = {};
+  private data: { [name: string]: boolean | number | string } = {};
 
-    if(!this.visited.includes(step.name)){
+  private nextStep(step: Step) {
+    if(this.stepperValid(step)) {
+      this.currentStep++;
+    } else {
       this.visited.push(step.name);
+      this.currIsValid = true;
     }
   }
 
-  public stepperValid(step: Step) {
-    const vis = this.visited.includes(step.name)
-    return (step.rules||[]).map(v => () => v(this.data) || vis);
+  // stepper is valid if was visite before and rules met
+  private stepperValid(step: Step) {
+    return (step.rules||[]).map(v => () => v(this.data)).every(b => b());
   }
 
-  public schema: { [name:string]: Array<string> } = {}
-  public data: { [name: string]: boolean | number | string } = {};
-
-  public countdown: boolean = false;
-
-  public valid: any = {}
-
-  get isValid() {
-    return Object.keys(this.valid).map(key=>this.valid[key]).reduce((a,b)=>a&&b, true)
+  get formValid() {
+    return this.valid.every(b=>b);
   }
 
   get timeDiff() {
@@ -98,60 +108,49 @@ export default class Anmeldung extends Vue {
     return then - now;
   }
 
-  public validateBeforeSend() {
-    console.log(this.data);
+  get everythingValid() {
+    const steppersValid = this.form.steps.every(step => this.stepperValid(step));
 
-    const reduce = (arr:Array<boolean>)=>{
-      return arr.reduce((a,b)=>a&&b, true)
-    }
-
-    const steppersValid = 
-      reduce(
-        this.form.steps.map(
-          v=>reduce(
-            (v.rules||[]).map(r=>r(this.data))
-          )
-        )
-      )
-    const formsValid = reduce(Object.keys(this.valid).map(key=>this.valid[key]))
-    if(steppersValid && formsValid) {
-      this.submitData();
-    } else {
-      alert("Fehlerhafte Daten")
-    }
+    return steppersValid && this.formValid;
   }
 
-  public submitData() {
-    const json = JSON.stringify({
-      eventID: this.event.id,
-      data: this.data,
-      schema: this.schema
-    });
 
-    this.blockSend=true
+  private submitData() {
 
-    Axios
-      .post('https://www.ec-nordbund.de/wp-json/ec-api/v1/anmeldung', json, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(res=>res.data)
-      .then(res => {
-        console.log(res)
-        if(res.state=="success"){
-          alert('Daten wurden erfolgreich übermittelt...')
-          location.href="https://ec-nordbund.de"
-        } else {
-          throw ''
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        alert('Bei der Übertragung der Daten ist ein Fehler aufgetreten. Bitte probiere es zu einem Späteren Zeitpunkt erneut.')
-      }).then(v=>{
-        this.blockSend=false
-      })
+    if(this.everythingValid) {
+
+      const json = JSON.stringify({
+        eventID: this.event.id,
+        data: this.data,
+        schema: this.schema
+      });
+
+      this.loading = true; 
+
+      Axios
+        .post('https://www.ec-nordbund.de/wp-json/ec-api/v1/anmeldung', json, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.data)
+        .then(data => {
+          // successful transmitted
+          this.success = data.state === "success";
+
+          throw '';
+
+          //if(!this.success) {
+            // throw 'Anmeldung could not be processed';
+          // }
+        })
+        .catch(error => {
+          this.error = true;
+          //alert('Bei der Übertragung der Daten ist ein Fehler aufgetreten. Bitte probiere es zu einem Späteren Zeitpunkt erneut.')
+        });
+    } else {
+      this.error = true;
+    }
   }
 
   @Prop({
@@ -159,21 +158,29 @@ export default class Anmeldung extends Vue {
   })
   public event!: Event;
 
-  blockSend = false
-
   @Prop({
     required: true,
   })
   public form!: Form;
+
+
+  @Watch('currentStep')
+  onStepChange(curr: number, prev: number) {
+    this.currIsValid = false;
+    const step = this.form.steps[prev-1]
+
+    if(!this.visited.includes(step.name)){
+      this.visited.push(step.name);
+    }
+  }
 
   @Watch('config', { immediate: true })
   public onConfigChange() {
 
     // set init values    
     this.form.steps.forEach((step) => {
-
       // TODO: extend schema (titles)
-      this.schema[step.name] = step.fields.map((f) => f.name);
+      this.schema[step.title] = step.fields.map((f) => f.name);
 
       step.fields.forEach((field) => {
         switch (field.type) {
