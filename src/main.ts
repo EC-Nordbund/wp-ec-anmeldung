@@ -134,7 +134,7 @@ function start() {
             type: 'string',
             required: true,
             counter: true,
-            maxlength: 20,
+            maxlength: 50,
             rules: [
               v=>v?true:'Bitte eine E-Mail-Adresse angeben'
             ]
@@ -207,6 +207,7 @@ function start() {
       {
         name: 'permissions',
         title: 'Erlaubnisse eines zuständigen Erziehungsberechtigten',
+        conditions: { hideOnOlderThan18: true },
         fields: [
           {
             name: '',
@@ -250,7 +251,8 @@ function start() {
         name: 'agreements',
         title: 'Datenschutz & Teilnahmebedingungen',
         rules: [
-          v=>v.agrees_teilnehmer_bedingung&&v.agrees_datenschutz
+          (v) => v.agrees_teilnehmer_bedingung,
+          (v) => v.agrees_datenschutz,
         ],
         fields: [
           {
@@ -261,7 +263,7 @@ function start() {
             rules: [
               (v) => v?true:'Diese Zustimmung ist erforderlich',
             ],
-            component: 'ec-checkbox'
+            component: 'ec-checkbox',
           },
           {
             name: 'agrees_datenschutz',
@@ -271,7 +273,7 @@ function start() {
             rules: [
               (v) => v?true:'Diese Zustimmung ist erforderlich',
             ],
-            component: 'ec-checkbox'
+            component: 'ec-checkbox',
           },
           {
             name: '',

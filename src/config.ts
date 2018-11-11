@@ -9,7 +9,7 @@ export interface Step {
   name: string;
   title: string;
   hint?: string;
-  conditions?: Conditions;
+  skip_ü18?: boolean;
   rules?: Array<(stepperVal:any)=>boolean>
   fields: Field[];
 }
@@ -23,18 +23,6 @@ export interface Field {
   lenght?: number;
   disabeled?: boolean;
   [key: string]: any;
-}
-
-export interface Conditions {
-  skip?: (
-    event: Event,
-    previous: Array<{ [key: string]: string | number | boolean }>,
-  ) => boolean;
-  error?: (
-    event: Event,
-    previous: Array<{ [key: string]: string | number | boolean }>,
-    current: { [key: string]: string | number | boolean },
-  ) => boolean | string;
 }
 
 export interface Form {

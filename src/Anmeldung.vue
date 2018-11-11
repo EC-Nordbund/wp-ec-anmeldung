@@ -26,12 +26,16 @@
                       :key="'field' + step.name + field.name"
                     />
                   </v-form>
+
+                  <v-alert :value="success && currentStep >= form.step.length" type="success">Daten wurden erfolgreich übermittelt!</v-alert>
+                  <v-alert :value="error && currentStep >= form.step.length" type="error">Daten wurden erfolgreich übermittelt!</v-alert>
+
                 </v-card-text>
 
                 <v-card-actions>
                   <v-spacer/>
                   <v-btn v-if="currentStep > 1" @click="currentStep--">Zurück</v-btn>
-                  <v-btn v-if="currentStep < form.steps.length" @click="nextStep(step)">Weiter</v-btn>
+                  <v-btn v-if="currentStep < form.steps.length" @click="nextStep(step, index)">Weiter</v-btn>
                   <v-btn :disabled="success || !everythingValid" v-else @click="submitData()">Absenden<v-progress-circular indeterminate v-if="loading" dark/></v-btn>
                 </v-card-actions>
               </v-card>
@@ -83,7 +87,11 @@ export default class Anmeldung extends Vue {
   private schema: { [name:string]: Array<string> } = {};
   private data: { [name: string]: boolean | number | string } = {};
 
-  private nextStep(step: Step) {
+  private nextStep(step: Step, index: number) {
+    if(!!this.form.steps[index+1].skip_ü18) {
+      //TODO: 18+
+    }
+
     if(this.stepperValid(step)) {
       this.currentStep++;
     } else {
@@ -110,8 +118,9 @@ export default class Anmeldung extends Vue {
 
   get everythingValid() {
     const steppersValid = this.form.steps.every(step => this.stepperValid(step));
+    const form_valid = this.formValid;
 
-    return steppersValid && this.formValid;
+    return (steppersValid && form_valid);
   }
 
 
@@ -135,14 +144,14 @@ export default class Anmeldung extends Vue {
         })
         .then(response => response.data)
         .then(data => {
+          this.loading = false;
+
           // successful transmitted
           this.success = data.state === "success";
 
-          throw '';
-
-          //if(!this.success) {
-            // throw 'Anmeldung could not be processed';
-          // }
+          if(!this.success) {
+            this.error = true;
+          }
         })
         .catch(error => {
           this.error = true;
@@ -151,6 +160,8 @@ export default class Anmeldung extends Vue {
     } else {
       this.error = true;
     }
+
+    this.loading = false;
   }
 
   @Prop({
@@ -179,7 +190,6 @@ export default class Anmeldung extends Vue {
 
     // set init values    
     this.form.steps.forEach((step) => {
-      // TODO: extend schema (titles)
       this.schema[step.title] = step.fields.map((f) => f.name);
 
       step.fields.forEach((field) => {
