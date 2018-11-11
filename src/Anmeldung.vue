@@ -3,7 +3,8 @@
         <v-stepper v-model="currentStep" vertical non-linear>
             <template v-for="(step, index) in form.steps">
 
-            <v-stepper-step :rules="(step.rules||[]).map(v=>(()=>visited.indexOf(index+1)===-1||v(data)))" :step="index+1" :key="'s' + index" editable>
+<!-- :rules="!stepperValid(index)" -->
+            <v-stepper-step :step="index+1" :key="'s' + index" :rules="(step.rules||[]).map(v => ()=>v(data) || !visited.includes(step.name))" editable>
               {{step.title}}
               <small>{{step.hint}}</small>
             </v-stepper-step>
@@ -22,10 +23,9 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer/>
-                  <v-progress-circular indeterminate color="accent" v-if="blockSend"/>
                   <v-btn :disabled="currentStep===1" @click="currentStep--">Zurück</v-btn>
                   <v-btn v-if="currentStep < form.steps.length" @click="currentStep++">Weiter</v-btn>
-                  <v-btn :disabled="blockSend || !isValid" v-else @click="printData()">Absenden</v-btn>
+                  <v-btn :disabled="blockSend || !isValid" v-else @click="validateBeforeSend()">Absenden<v-progress-circular indeterminate dark v-if="blockSend"/></v-btn>
                 </v-card-actions>
               </v-card>
             </v-stepper-content>
@@ -57,17 +57,27 @@ Vue.component('ec-label', label)
 Vue.component('ec-checkbox', checkbox)
 
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
-import { Form, Event } from '@/config';
+import { Form, Event, Step } from '@/config';
 
 @Component({})
 export default class Anmeldung extends Vue {
-  public currentStep: number = 1;
+  private currentStep: number = 1;
+
+  private visited: string[] = [];
+
 
   @Watch('currentStep')
-  onStepChange() {
-    if(this.visited.indexOf(this.currentStep)===-1){
-      this.visited.push(this.currentStep)
+  onStepChange(curr: number, prev: number) {
+    const step = this.form.steps[prev-1];
+
+    if(!this.visited.includes(step.name)){
+      this.visited.push(step.name);
     }
+  }
+
+  public stepperValid(step: Step) {
+    const vis = this.visited.includes(step.name)
+    return (step.rules||[]).map(v => () => v(this.data) || vis);
   }
 
   public schema: { [name:string]: Array<string> } = {}
@@ -88,7 +98,7 @@ export default class Anmeldung extends Vue {
     return then - now;
   }
 
-  public printData() {
+  public validateBeforeSend() {
     console.log(this.data);
 
     const reduce = (arr:Array<boolean>)=>{
@@ -155,8 +165,6 @@ export default class Anmeldung extends Vue {
     required: true,
   })
   public form!: Form;
-
-  visited = [1]
 
   @Watch('config', { immediate: true })
   public onConfigChange() {

@@ -32,7 +32,7 @@ const init = (
 };
 (window as any).createAnmeldung = init;
 
-// start();
+start();
 
 function start() {
 
@@ -48,7 +48,13 @@ function start() {
         name: 'person',
         title: 'Persöhnliche Daten',
         rules: [
-          v=>v.geschlecht&&v.vorname&&v.vorname.length > 0 && v.nachname && v.nachname.length > 0 && v.gebDat && v.gebDat.length > 0
+          (v) => v.geschlecht,
+          (v) => v.vorname,
+          (v) => v.vorname.length > 0,
+          (v) => v.nachname,
+          (v) => v.nachname.length > 0,
+          (v) => v.gebDat,
+          (v) => v.gebDat.length > 0,
         ],
         fields: [
           {
