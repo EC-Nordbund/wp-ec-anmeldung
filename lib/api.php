@@ -375,8 +375,20 @@ function eca_registration_prepare_graphql_mutation($event_id, $data, $created) {
     }
 
     
-    // TODO: extra fields (json)
+    $known_extra_fields = array('agrees_freizeitleitung');
 
+
+    $existing_known_extra_fields = array_filter($known_extra_fields, function($key) {
+        return isset($data[$key])
+    });
+
+    $extra_fields = array_map(function($key) {
+        return array($key => $data[$key]);
+    }, $existing_known_extra_fields);
+
+    if(!empty($extra_fields)) {
+        $param['extra_json'] = json_decode($extra_fields);
+    }
 
 
     $params_str = '';
