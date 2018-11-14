@@ -250,7 +250,7 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
     if($status === 'delayed_expiration') {
         $value = eca_registration_delay_expiration($token);
 
-        eca_error_mail($token, $value, $error, $mutation);
+        eca_error_mail($token, $mail['to'] ,$value, $error, $mutation);
     }
 
     return array('status' => $status, 'value' => $value);
