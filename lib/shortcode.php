@@ -2,7 +2,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('ANMELDE_START', '2018-11-11T15:00:00');
+define('ANMELDE_START', 'Date.UTC(2018, 10, 11, 10, 0, 0, 0)');
 
 function eca_anmeldung_shortcode($atts) {
     
@@ -53,7 +53,23 @@ function eca_anmeldung_shortcode($atts) {
       $html .= eca_initialisation_script($event_id, $event['event_name']);
     }
 
+    $html .= eca_alert_browser_compatibility();
+
     return $html;
+}
+
+function eca_alert_browser_compatibility() {
+  $alert = '<style>.alert { padding: 20px; background-color: #467A2A; color: white; }';
+  $alert .= '.closebtn { margin-left: 15px; color: white; font-weight: bold; float: right; font-size: 22px; line-height: 20px; cursor: pointer; transition: 0.3s; }';
+  $alert .= '.closebtn:hover { color: black; opacity: 0.5; }</style>';
+
+  $alert .= '<br/><div class="alert">';
+  $alert .= '<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span>';
+  $alert .= '<strong>Hinweis zur Kompatibilität:</strong>';
+  $alert .= '<br/>Falls du auf dieser Seite keinen Anmelde-Button entdecken kannst, ist es von dem verwendeten Browser zur Zeit nicht möglich sich anzumelden.';
+  $alert .= '<br/>Bitte weiche auf einen anderen Browser aus. Wir empfehlen Firefox oder Google Chrome.</div>';
+
+  return $alert;
 }
 
 function eca_add_script_tags() {
@@ -96,7 +112,7 @@ function eca_initialisation_script($event_id = -1, $event_name = '', $form_id = 
 
   $script = "<script> const init_event = {
     id: " . $event_id . ",
-    title: '" . $event_name . "', start: new Date('" . $start . "') };";
+    title: '" . $event_name . "', start: new Date(" . $start . ") };";
   
   $script .= file_get_contents( ECA_PLUGIN_DIR . '/lib/forms.js');
   

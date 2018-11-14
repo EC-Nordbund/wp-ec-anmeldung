@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) exit;
 function eca_final_mail($to = '', $event_id = -1, $vorname = '', $nachname = '', $wartelistenplatz = 0) {
     $headers[] = 'From: EC-Nordbund <noreply@ec-nordbund.de>';
     $headers[] = 'Reply-To: Referent <referent@ec-nordbund.de>';
-    $headers[] = 'Content-Type: text/html';
+    $headers[] = 'Content-Type: text/html; charset=UTF-8';
 
     $subject = 'Deine Anmeldung war erfolgreich';
 
@@ -31,6 +31,21 @@ function eca_final_mail($to = '', $event_id = -1, $vorname = '', $nachname = '',
     wp_mail($to, $subject, $message , $headers);
 }
 
+function eca_error_mail($token = '', $expires = 0, $error = array(), $mutation = '') {
+    $headers[] = 'From: EC-Nordbund <noreply@ec-nordbund.de>';
+    $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+    $message = json_encode(array(
+        'token' => $token,
+        'expires' => $expires,
+        'errors' => $error,
+    ), JSON_PRETTY_PRINT);
+
+    $message .= "\n\nmutation: " . $mutation;
+
+    wp_mail('webmaster@ec-nordbund.de', 'Anmeldung: Fehler beim API-Reqeust', $message, $headers);
+}
+
 function eca_confirmation_mail($to = '', $event_id = -1, $token = 'no_token', $data = array(), $schema = array()) {
 
     $error = $responce = array();
@@ -38,7 +53,7 @@ function eca_confirmation_mail($to = '', $event_id = -1, $token = 'no_token', $d
     $headers[] = 'From: EC-Nordbund <noreply@ec-nordbund.de>';
     //$headers[] = 'Bcc: webmaster@ec-nordbund.de';
     $headers[] = 'Reply-To: Referent <referent@ec-nordbund.de>';
-    $headers[] = 'Content-Type: text/html';
+    $headers[] = 'Content-Type: text/html; charset=UTF-8';
 
     $subject = 'Bestätige deine Anmeldung';
 
@@ -61,7 +76,7 @@ function eca_confirmation_mail($to = '', $event_id = -1, $token = 'no_token', $d
 
         // Header for Admin
         $a_headers[] = 'From: EC-Nordbund <noreply@ec-nordbund.de>';
-        $a_headers[] = 'Content-Type: text/plain';
+        $a_headers[] = 'Content-Type: text/plain; charset=UTF-8';
 
         // Message for Admin
         $admin_message = json_encode(array(
@@ -76,8 +91,9 @@ function eca_confirmation_mail($to = '', $event_id = -1, $token = 'no_token', $d
         $mailed = wp_mail($to, $subject, $message , $headers);
 
         if($mailed) {
+            
             // Admin Mail
-            $mailed = wp_mail('webmaster@ec-nordbund.de', 'Info: Neue Anmeldung', $admin_message, $a_headers);
+            wp_mail('webmaster@ec-nordbund.de', 'Info: Neue Anmeldung', $admin_message, $a_headers);
 
             $responce['mailed'] = $mailed;
         } else {

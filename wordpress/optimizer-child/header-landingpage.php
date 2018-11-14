@@ -13,6 +13,7 @@ $optimizer = optimizer_option_defaults();
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" <?php language_attributes(); ?> <?php optimizer_schema_page_type(); ?>>
 <head>
+<title>Anmeldung bestätigen | EC-Nordbund</title>
 <meta http-equiv="Content-Type" content="<?php bloginfo('html_type'); ?>; charset=<?php bloginfo( 'charset' ); ?>" />	
 <?php // Google Chrome Frame for IE ?>
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->

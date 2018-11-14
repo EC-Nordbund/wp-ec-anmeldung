@@ -40,7 +40,10 @@
                     v-else
                     :disabled="success || !everythingValid"
                     color="primary"
-                    @click="submitData()">Absenden<v-progress-circular indeterminate v-if="loading" dark/></v-btn>
+                    @click="submitData()">
+                    <v-progress-circular indeterminate v-if="loading" dark/>
+                    <span v-else>Absenden</span>
+                  </v-btn>
                 </v-card-actions>
               </v-card>
             </v-stepper-content>
@@ -113,13 +116,6 @@ export default class Anmeldung extends Vue {
     return this.valid.every(b=>b);
   }
 
-  get timeDiff() {
-    const now = new Date().getTime();
-    const then = this.event.start.getTime();
-    
-    return then - now;
-  }
-
   get everythingValid() {
     const steppersValid = this.form.steps.every(step => this.stepperValid(step));
     const form_valid = this.formValid;
@@ -129,6 +125,8 @@ export default class Anmeldung extends Vue {
 
 
   private submitData() {
+
+    // console.log(this.data)
 
     if(this.everythingValid) {
 
