@@ -36,10 +36,6 @@ function eca_anmeldung_shortcode($atts) {
     $html .= "<strong>We're sorry but vue-ec-anmeldung doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>";
     $html .= "</noscript>";
 
-    $html .= '<h3 style="color: #AC1636;">Es gibt zur Zeit Kompatiblitäts-Probleme mit einigen Browser</h3>';
-    $html .= '<p>Die mobile Nutzung der Anmeldung ist sehr ungewisst.<br/>';
-    $html .= 'Wir empfehlen Firefox oder Google Chrome über einen Desktop-PC zu nutzen</p>';
-
     $html .= '<style> .application--wrap { min-height: unset !important; } 
       .v-input--selection-controls { margin-top: unset !important; }
       .v-date-picker-table { height: unset !important; } </style>';
@@ -57,7 +53,23 @@ function eca_anmeldung_shortcode($atts) {
       $html .= eca_initialisation_script($event_id, $event['event_name']);
     }
 
+    $html .= eca_alert_browser_compatibility();
+
     return $html;
+}
+
+function eca_alert_browser_compatibility() {
+  $alert = '<style>.alert { padding: 20px; background-color: #467A2A; color: white; }';
+  $alert .= '.closebtn { margin-left: 15px; color: white; font-weight: bold; float: right; font-size: 22px; line-height: 20px; cursor: pointer; transition: 0.3s; }';
+  $alert .= '.closebtn:hover { color: black; opacity: 0.5; }</style>';
+
+  $alert .= '<br/><div class="alert">';
+  $alert .= '<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span>';
+  $alert .= '<strong>Hinweis zur Kompatibilität:</strong>';
+  $alert .= '<br/>Falls du auf dieser Seite keinen Anmelde-Button entdecken kannst, ist es von dem verwendeten Browser zur Zeit nicht möglich sich anzumelden.';
+  $alert .= '<br/>Bitte weiche auf einen anderen Browser aus. Wir empfehlen Firefox oder Google Chrome.</div>';
+
+  return $alert;
 }
 
 function eca_add_script_tags() {
