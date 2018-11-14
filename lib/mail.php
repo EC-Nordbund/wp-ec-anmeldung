@@ -31,17 +31,18 @@ function eca_final_mail($to = '', $event_id = -1, $vorname = '', $nachname = '',
     wp_mail($to, $subject, $message , $headers);
 }
 
-function eca_error_mail($token = '', $expires = 0, $error = array(), $mutation = '') {
+function eca_error_mail($token = '', $email = '', $expires = 0, $error = array(), $mutation = '') {
     $headers[] = 'From: EC-Nordbund <noreply@ec-nordbund.de>';
     $headers[] = 'Content-Type: text/plain; charset=UTF-8';
 
-    $message = json_encode(array(
-        'token' => $token,
-        'expires' => $expires,
-        'errors' => $error,
-    ), JSON_PRETTY_PRINT);
-
-    $message .= "\n\nmutation: " . $mutation;
+    $message = 'Kontakt' . $email . "\n\n";
+    $message .= "== Details ======================================================!\n";
+    $message .= $mutation . "\n\n";
+    $message .= 'Token: ' . $token ."\n\n";
+    $message .= 'Expires' . date('Y.m.d \a\t H:i:s', $expires) ."\n\n";
+    
+    $message .= "== Errors =======================================================!\n";
+    $message .= json_encode($error, JSON_PRETTY_PRINT);
 
     wp_mail('webmaster@ec-nordbund.de', 'Anmeldung: Fehler beim API-Reqeust', $message, $headers);
 }
@@ -51,7 +52,6 @@ function eca_confirmation_mail($to = '', $event_id = -1, $token = 'no_token', $d
     $error = $responce = array();
 
     $headers[] = 'From: EC-Nordbund <noreply@ec-nordbund.de>';
-    //$headers[] = 'Bcc: webmaster@ec-nordbund.de';
     $headers[] = 'Reply-To: Referent <referent@ec-nordbund.de>';
     $headers[] = 'Content-Type: text/html; charset=UTF-8';
 
