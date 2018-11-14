@@ -47,6 +47,21 @@ function eca_error_mail($token = '', $email = '', $expires = 0, $error = array()
     wp_mail('webmaster@ec-nordbund.de', 'Anmeldung: Fehler beim API-Reqeust', $message, $headers);
 }
 
+function eca_admin_copy_mail($token = '', $event = array(), $data = array()) {
+
+    $headers[] = 'From: EC-Nordbund <noreply@ec-nordbund.de>';
+    $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+    $message = json_encode(array(
+        'token' => $token,
+        'event' => $event,
+        'data' => $data,
+        'timestamp' => date(DATE_RSS)
+    ), JSON_PRETTY_PRINT);
+
+    wp_mail('webmaster@ec-nordbund.de', 'Info: Neue Anmeldung', $message, $headers);
+}
+
 function eca_confirmation_mail($to = '', $event_id = -1, $token = 'no_token', $data = array(), $schema = array()) {
 
     $error = $responce = array();
@@ -74,28 +89,13 @@ function eca_confirmation_mail($to = '', $event_id = -1, $token = 'no_token', $d
             'token' => $token
         ), $data, $schema);
 
-        // Header for Admin
-        $a_headers[] = 'From: EC-Nordbund <noreply@ec-nordbund.de>';
-        $a_headers[] = 'Content-Type: text/plain; charset=UTF-8';
-
-        // Message for Admin
-        $admin_message = json_encode(array(
-            'token' => $token,
-            'event' => $event,
-            'data' => $data,
-            'timestamp' => date(DATE_RSS)
-        ), JSON_PRETTY_PRINT);
-
-        // $message = json_encode($matches);   // only for DEV purpose
-
         $mailed = wp_mail($to, $subject, $message , $headers);
 
         if($mailed) {
-            
-            // Admin Mail
-            wp_mail('webmaster@ec-nordbund.de', 'Info: Neue Anmeldung', $admin_message, $a_headers);
-
             $responce['mailed'] = $mailed;
+
+            // Mail to Admin
+            eca_admin_copy_mail($token, $event, $data);
         } else {
             $error['mailer'] = 'Mail could not be sended.';
         }
