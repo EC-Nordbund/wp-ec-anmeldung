@@ -3,7 +3,6 @@ import './plugins/vuetify.js';
 import Dialog from './Dialog.vue';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
-
 import { Form, Event } from './config';
 import formElement from '@/components/formComponent';
 import radio from '@/components/radio';
@@ -183,7 +182,7 @@ function start() {
             label: 'Ich möchte vegetarisches Essen',
             required: true,
             type: 'boolean',
-            component: 'v-checkbox',
+            component: 'ec-checkbox',
           },
           {
             name: 'lebensmittel',

@@ -155,13 +155,10 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
     $valid = eca_check_required_fields($api_event_id, $data);
 
     if(!$valid['state']) {
-        $api_event_id = 4200;
-        $valid = eca_check_required_fields($api_event_id, $data);
-    }
-
-    if(!$valid['state']) {
         $error['validation'] = $valid['value'];
     }
+
+    $mutation = '';
 
     if(empty($error)) {
         $mutation = eca_registration_prepare_graphql_mutation($api_event_id, $data, $created);
@@ -252,6 +249,8 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
 
     if($status === 'delayed_expiration') {
         $value = eca_registration_delay_expiration($token);
+
+        eca_error_mail($token, $mail['to'] ,$value, $error, $mutation);
     }
 
     return array('status' => $status, 'value' => $value);
@@ -350,6 +349,10 @@ function eca_registration_prepare_graphql_mutation($event_id, $data, $created) {
         $params['gesundheitsinformationen'] = $data['gesundheitsinformationen'];
     }
 
+    if(isset($date['bemerkungen'])) {
+        $params['bemerkungen'] = $data['bemerkungen'];
+    }
+
     if(isset($data['schwimmen'])) {
         $params['schwimmen'] = $data['schwimmen'];
     }
@@ -394,7 +397,9 @@ function eca_registration_prepare_graphql_mutation($event_id, $data, $created) {
     $params_str = '';
     foreach ($params as $key => $value) {
         // string
-        if(is_string($value)) { 
+        if(is_string($value)) {
+            $value = str_replace("\n", ' ', $value);
+
             $params_str .= $key . ': "' . $value . '", ';
             // $params_str .= $key . ': "string", ';
 

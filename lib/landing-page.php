@@ -81,11 +81,6 @@ class ECA_LandingPage {
         $body = '';
     
         switch ($status) {
-            case 'waiting_for_confirmation':
-                $title = 'Deine Anmeldung kann zur Zeit nicht entgegengenommen werden';
-                $body = '<p>Bitte versuche es zu einem späteren Zeitpunkt nochmal.</p>';
-                break;
-    
             case 'not_found':
                 $title = 'Keine Daten mit diesem Link gefunden';
                 $body = '<p>Überprüfe, ob der Link mit dem aus der Bestätigungs-E-Mail übereinstimmt.</p>';
@@ -120,13 +115,12 @@ class ECA_LandingPage {
             
             case 'delayed_expiration':
                 $title = 'Anmeldung zur Zeit nicht möglich';
-                $body = '<p>Wir verzögern das Löschen deiner Anmeldedaten um 24 Stunden</p>';
-                if($value > 0) {
-                    $body .= '<p>Bitte probiere es bis morgen um ' . date('H:i', $value) . ' noch einmal aus.</p>';
-                }
+                $body = '<p>Wir wurden über diesen Fehler informiert und melden uns bei dir.</p>';
+                $body .= '<p>Das Einreichen einer neuen Anmeldung ist vorerst nicht notwendig.</p>';
                 break;
 
             case 'authentication_failed':
+            case 'waiting_for_confirmation':
             default:
                 $title = 'Anfrage konnte nicht verarbeitet werden';
                 $body = '<p>Ooops, das tut uns Leid.</p>';

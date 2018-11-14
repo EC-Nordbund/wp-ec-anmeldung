@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) exit;
 function eca_final_mail($to = '', $event_id = -1, $vorname = '', $nachname = '', $wartelistenplatz = 0) {
     $headers[] = 'From: EC-Nordbund <noreply@ec-nordbund.de>';
     $headers[] = 'Reply-To: Referent <referent@ec-nordbund.de>';
-    $headers[] = 'Content-Type: text/html';
+    $headers[] = 'Content-Type: text/html; charset=UTF-8';
 
     $subject = 'Deine Anmeldung war erfolgreich';
 
@@ -31,14 +31,50 @@ function eca_final_mail($to = '', $event_id = -1, $vorname = '', $nachname = '',
     wp_mail($to, $subject, $message , $headers);
 }
 
+function eca_error_mail($token = '', $email = '', $expires = 0, $error = array(), $mutation = '') {
+    $headers[] = 'From: EC-Nordbund <noreply@ec-nordbund.de>';
+    $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+    $message = 'Kontakt: ' . $email . "\n\n";
+    $message .= "== Details =================================================================\n";
+    $message .= 'Token: ' . $token ."\n\n";
+
+    if(!empty($mutation)) {
+        $message .= $mutation . "\n\n";
+    }
+
+    if(!empty($expires)) {
+        $message .= 'Expires' . date('Y.m.d \a\t H:i:s', $expires) ."\n\n";
+    }
+
+    $message .= "== Errors ==================================================================\n";
+    $message .= json_encode($error, JSON_PRETTY_PRINT);
+
+    wp_mail('webmaster@ec-nordbund.de', 'Anmeldung: Fehler beim API-Reqeust', $message, $headers);
+}
+
+function eca_admin_copy_mail($token = '', $event = array(), $data = array()) {
+
+    $headers[] = 'From: EC-Nordbund <noreply@ec-nordbund.de>';
+    $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+    $message = json_encode(array(
+        'token' => $token,
+        'event' => $event,
+        'data' => $data,
+        'timestamp' => date(DATE_RSS)
+    ), JSON_PRETTY_PRINT);
+
+    wp_mail('webmaster@ec-nordbund.de', 'Info: Neue Anmeldung', $message, $headers);
+}
+
 function eca_confirmation_mail($to = '', $event_id = -1, $token = 'no_token', $data = array(), $schema = array()) {
 
     $error = $responce = array();
 
     $headers[] = 'From: EC-Nordbund <noreply@ec-nordbund.de>';
-    //$headers[] = 'Bcc: webmaster@ec-nordbund.de';
     $headers[] = 'Reply-To: Referent <referent@ec-nordbund.de>';
-    $headers[] = 'Content-Type: text/html';
+    $headers[] = 'Content-Type: text/html; charset=UTF-8';
 
     $subject = 'Bestätige deine Anmeldung';
 
@@ -59,29 +95,16 @@ function eca_confirmation_mail($to = '', $event_id = -1, $token = 'no_token', $d
             'token' => $token
         ), $data, $schema);
 
-        // Header for Admin
-        $a_headers[] = 'From: EC-Nordbund <noreply@ec-nordbund.de>';
-        $a_headers[] = 'Content-Type: text/plain';
-
-        // Message for Admin
-        $admin_message = json_encode(array(
-            'token' => $token,
-            'event' => $event,
-            'data' => $data,
-            'timestamp' => date(DATE_RSS)
-        ), JSON_PRETTY_PRINT);
-
-        // $message = json_encode($matches);   // only for DEV purpose
-
         $mailed = wp_mail($to, $subject, $message , $headers);
 
         if($mailed) {
-            // Admin Mail
-            $mailed = wp_mail('webmaster@ec-nordbund.de', 'Info: Neue Anmeldung', $admin_message, $a_headers);
-
             $responce['mailed'] = $mailed;
+
+            // Mail to Admin
+            eca_admin_copy_mail($token, $event, $data);
         } else {
             $error['mailer'] = 'Mail could not be sended.';
+            eca_error_mail($token, $to, 0, $error);
         }
     }
 
