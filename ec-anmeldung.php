@@ -5,7 +5,11 @@ Plugin URI:
 Description: 
 Author: EC-Nordbund Developer (Tobias Krause)
 Author URI: https://bitbucket.org/ecnb-devs/
-Version: 1.0
+<<<<<<< HEAD
+Version: 1.1
+=======
+Version: 1.0.1
+>>>>>>> c5ae05735a1b5e7ddbc9caa41d7988ceca6958e7
 */
 
 if (!defined('ABSPATH')) exit;
