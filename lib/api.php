@@ -145,7 +145,7 @@ function eca_success_mail_values($event_id = -1, $data = array()) {
     return $val;
 }
 
-function eca_registration_send_to_server($token, $event_id, $data, $created) {
+function eca_registration_send_to_server($token, $event_id, $data, $created, $debug = false, $dontSend = false) {
     $error = array();
 
     $mail = eca_success_mail_values($event_id, $data);
@@ -154,38 +154,51 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
 
     $valid = eca_check_required_fields($api_event_id, $data);
 
+    if($debug) {
+        $api_event_id = 4200;
+        $valid = eca_check_required_fields($api_event_id, $data);
+    }
+
     if(!$valid['state']) {
         $error['validation'] = $valid['value'];
     }
 
     $mutation = '';
+    $curl_info = array();
 
     if(empty($error)) {
         $mutation = eca_registration_prepare_graphql_mutation($api_event_id, $data, $created);
         $query = json_encode(array('query' => $mutation));
 
-        $ch = curl_init();
+        if(!$dontSend) {
+            $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, "https://ec-api.de/graphql");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
-        curl_setopt($ch, CURLOPT_POST, TRUE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+            curl_setopt($ch, CURLOPT_URL, "https://ec-api.de/graphql");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
+            curl_setopt($ch, CURLOPT_POST, TRUE);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 
-        $headers = array();
-        $headers[] = "Content-Type: application/json";
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            $headers = array();
+            $headers[] = "Content-Type: application/json";
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
-        $result = curl_exec($ch);
-        if (curl_errno($ch)) {
-            $error['curl'] = curl_error($ch);
+            $result = curl_exec($ch);
+
+            $curl_info = curl_getinfo($ch);
+
+            if (curl_errno($ch)) {
+                $error['curl'] = curl_error($ch);
+                $error['curl_info'] = $curl_info;
+            }
+
+            curl_close ($ch);
         }
-        curl_close ($ch);
     }
 
-
     $json = '';
+    $resp = array();
 
     if(empty($error)) {
         $json = json_decode($result, true);
@@ -193,6 +206,8 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
 
     if(empty($json)) {
         $error['json'] = 'Empty result.';
+    } else {
+        $resp = $json['data']['anmelden'];
     }
 
     if(!empty($json['errors'])) {
@@ -202,18 +217,18 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
     $status = 'delayed_expiration';
     $value = 0;
 
-    if(empty($error) && !empty($json['data']['anmelden']['anmeldeID'])) {
-        $id = $json['data']['anmelden']['anmeldeID'];
+    if(empty($error) && !empty($resp['anmeldeID'])) {
+        $id = $resp['anmeldeID'];
 
         if(is_string($id)) {
             eca_set_anmelde_id_form_api($token, $id);
         } else {
-            $error['json'] = 'anmeldeId not string';
+            $error['json'] = 'anmeldeID is not a string';
         }
     }
 
-    if(empty($error) && is_integer($json['data']['anmelden']['status'])) {
-        $r = $json['data']['anmelden']['status'];
+    if(empty($error) && is_integer($resp['status'])) {
+        $r = $resp['status'];
 
         switch ($r) {
 
@@ -247,9 +262,16 @@ function eca_registration_send_to_server($token, $event_id, $data, $created) {
         }
     }
 
+    if($debug) {
+        print($mutation);
+        print(json_encode($json, JSON_PRETTY_PRINT));
+        print(json_encode($curl_info, JSON_PRETTY_PRINT));
+    }
+
     if($status === 'delayed_expiration') {
         $value = eca_registration_delay_expiration($token);
 
+        // Send json response
         eca_error_mail($token, $mail['to'] ,$value, $error, $mutation);
     }
 

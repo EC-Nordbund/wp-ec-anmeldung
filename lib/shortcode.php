@@ -9,7 +9,7 @@ function eca_anmeldung_shortcode($atts) {
     // set attributes with specified defaults
     $attributes = shortcode_atts(
         array(
-            'form_id' => -1,
+            'form_id' => 0,
             'event_id' => -1,
             'start' => ''
         ),
@@ -50,7 +50,7 @@ function eca_anmeldung_shortcode($atts) {
     if(!empty($start)) {
       $html .= eca_initialisation_script($event_id, $event['event_name'], $form_id, $start);
     } else {
-      $html .= eca_initialisation_script($event_id, $event['event_name']);
+      $html .= eca_initialisation_script($event_id, $event['event_name'], $form_id);
     }
 
     $html .= eca_alert_browser_compatibility();

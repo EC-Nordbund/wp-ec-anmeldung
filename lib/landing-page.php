@@ -32,7 +32,9 @@ class ECA_LandingPage {
                     $token,
                     $registration['event_id'],
                     json_decode($registration['data_as_json'], true),
-                    $registration['created_at']
+                    $registration['created_at'],
+                    $this->debug($params),
+                    $this->dontSend($params)
                 );
 
                 // updates status in DB
@@ -44,6 +46,10 @@ class ECA_LandingPage {
 
             return $this->message($message['title'], $message['body']);
         }
+
+        if($this->debug($params)) {
+            return $this->message('Debug-Mode aktivated');
+        } 
 
         return $this->message('Dieser Link ist ungültig');
     }
@@ -73,6 +79,20 @@ class ECA_LandingPage {
         }
 
         return $token;
+    }
+
+    private function debug($get) {
+        if(isset($get['debug'])) {
+            return boolval($get['debug']);
+        }
+        return false;
+    }
+
+    private function dontSend($get) {
+        if(isset($get['dontSend'])) {
+            return boolval($get['dontSend']);
+        }
+        return false;
     }
 
 
