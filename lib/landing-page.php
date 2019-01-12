@@ -22,7 +22,8 @@ class ECA_LandingPage {
                 'waiting_for_confirmation',
                 'delayed_expiration',
                 'waitingqueue',
-                'authentication_failed'
+                'authentication_failed',
+                'debug'
             );
 
             if(in_array($response['status'], $fetch_states, true)) {
@@ -137,6 +138,11 @@ class ECA_LandingPage {
                 $title = 'Anmeldung zur Zeit nicht möglich';
                 $body = '<p>Wir wurden über diesen Fehler informiert und melden uns bei dir.</p>';
                 $body .= '<p>Das Einreichen einer neuen Anmeldung ist vorerst nicht notwendig.</p>';
+                break;
+
+            case 'debug':
+                $title = 'Debug';
+                $body = $value;
                 break;
 
             case 'authentication_failed':
