@@ -173,7 +173,7 @@ function eca_registration_send_to_server($token, $event_id, $data, $created, $de
         if(!$dontSend) {
             $ch = curl_init();
 
-            curl_setopt($ch, CURLOPT_URL, "https://ec-api.de/graphql");
+            curl_setopt($ch, CURLOPT_URL, "https://api.ec-nordbund.de/graphql");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
             curl_setopt($ch, CURLOPT_POST, TRUE);
@@ -263,7 +263,12 @@ function eca_registration_send_to_server($token, $event_id, $data, $created, $de
     }
 
     if($debug) {
-        print($mutation);
+        $mut_for_debug = '';
+        if(defined('API_TOKEN')) {
+            $mut_for_debug = str_replace(API_TOKEN, "API_TOKEN", $mutation);
+        }
+
+        print($mut_for_debug);
         print(json_encode($json, JSON_PRETTY_PRINT));
         print(json_encode($curl_info, JSON_PRETTY_PRINT));
     }
@@ -458,7 +463,7 @@ function eca_check_required_fields($event_id, $date) {
     // event id positiv 
     if(!is_integer($event_id) || $event_id < 0) {
         $state = false;
-        $value = 'event_id no positive integer';
+        $value = 'event_id no positive integer: '.$event_id;
     }
 
     $required =array(
