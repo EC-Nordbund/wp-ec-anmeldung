@@ -44,11 +44,14 @@ function eca_error_mail($token = '', $email = '', $expires = 0, $error = array()
     }
 
     if(!empty($expires)) {
-        $message .= 'Expires' . date('Y.m.d \a\t H:i:s', $expires) ."\n\n";
+        $message .= 'Expires ' . date('d.m.Y \a\t H:i:s', $expires) ."\n\n";
     }
 
     $message .= "== Errors ==================================================================\n";
-    $message .= json_encode($error, JSON_PRETTY_PRINT);
+
+    foreach ($error as $area => $msg) {
+        $message .= $area . ": " . $msg;
+    }
 
     wp_mail('webmaster@ec-nordbund.de', 'Anmeldung: Fehler beim API-Reqeust', $message, $headers);
 }
@@ -62,7 +65,7 @@ function eca_admin_copy_mail($token = '', $event = array(), $data = array()) {
         'token' => $token,
         'event' => $event,
         'data' => $data,
-        'timestamp' => date(DATE_RSS)
+        'timestamp' => strftime("%d %b %Y at %H:%M:%S")
     ), JSON_PRETTY_PRINT);
 
     wp_mail('webmaster@ec-nordbund.de', 'Info: Neue Anmeldung', $message, $headers);

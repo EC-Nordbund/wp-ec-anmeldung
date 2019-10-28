@@ -43,11 +43,11 @@ function eca_handle_registration( WP_REST_Request $request) {
         $email_to = eca_get_value_of_key_r('email', $data);
 
         if(!isset($email_to)) {
-            $error['email'] = 'E-Mail field is required but missing.';
+            $error['Email'] = 'Address of the receiver is missing.';
         }
 
         if(empty($error) && empty($email_to)) {
-            $error['email'] = 'E-Mail field is empty.';
+            $error['Email'] = 'Address of the receiver is empty.';
         }
 
         if(empty($error)) {
@@ -63,7 +63,7 @@ function eca_handle_registration( WP_REST_Request $request) {
 
             // Add errors
             if(isset($db_access['error'])) {
-                $error['database'] = $db_access['error'];
+                $error['Database'] = $db_access['error'];
             } else {
                 $response = array('database' => $db_access);
             }
@@ -74,7 +74,7 @@ function eca_handle_registration( WP_REST_Request $request) {
 
             // Add errors
             if(isset($mailer_responce['error'])) {
-                $error['confirmation_mail'] = $mailer_responce['error'];
+                $error['Confirmation Mail'] = $mailer_responce['error'];
             } else {
                 $response['confirmation_mail'] =  $mailer_responce;
             }
@@ -160,7 +160,7 @@ function eca_registration_send_to_server($token, $event_id, $data, $created, $de
     }
 
     if(!$valid['state']) {
-        $error['validation'] = $valid['value'];
+        $error['Validation'] = $valid['value'];
     }
 
     $mutation = '';
@@ -189,8 +189,8 @@ function eca_registration_send_to_server($token, $event_id, $data, $created, $de
             $curl_info = curl_getinfo($ch);
 
             if (curl_errno($ch)) {
-                $error['curl'] = curl_error($ch);
-                $error['curl_info'] = $curl_info;
+                $error['Curl Error'] = curl_error($ch);
+                $error['Curl Information'] = $curl_info;
             }
 
             curl_close ($ch);
@@ -205,13 +205,13 @@ function eca_registration_send_to_server($token, $event_id, $data, $created, $de
     }
 
     if(empty($json)) {
-        $error['json'] = 'Empty result.';
+        $error['API Response'] = 'Empty or not as JSON decodable result: ' . $result;
     } else {
         $resp = $json['data']['anmelden'];
     }
 
     if(!empty($json['errors'])) {
-        $error['graphQL'] = $json['errors'];
+        $error['GraphQL'] = json_encode($json, JSON_PRETTY_PRINT);
     }
 
     $status = 'delayed_expiration';
@@ -223,7 +223,7 @@ function eca_registration_send_to_server($token, $event_id, $data, $created, $de
         if(is_string($id)) {
             eca_set_anmelde_id_form_api($token, $id);
         } else {
-            $error['json'] = 'anmeldeID is not a string';
+            $error['API Response'] = 'anmeldeID is not a string';
         }
     }
 
@@ -273,7 +273,7 @@ function eca_registration_send_to_server($token, $event_id, $data, $created, $de
         print(json_encode($curl_info, JSON_PRETTY_PRINT));
     }
 
-    if($status === 'delayed_expiration') {
+    if($status === 'delayed_expiration' || $status === 'authentication_failed') {
         $value = eca_registration_delay_expiration($token);
 
         // Send json response
@@ -300,7 +300,7 @@ function eca_registration_prepare_graphql_mutation($event_id, $data, $created) {
         'anmeldeZeitpunkt' => date_create($created)->format('Y-m-d H:i:s'),
         'vorname' => 'leer',
         'nachname' => 'leer',
-        'gebDat' => $timestamp->format('Y-m-d'),
+        'gebDat' => strftime('%Y-%m-%d'),
         'geschlecht' => '',
         'eMail' => '',
         'telefon' => '',
