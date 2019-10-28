@@ -112,7 +112,7 @@ function eca_initialisation_script($event_id = -1, $event_name = '', $form_id = 
 
   $script = "<script> const init_event = {
     id: " . $event_id . ",
-    title: '" . $event_name . "', start: new Date(" . $start . ") };";
+    title: '" . addcslashes($event_name, "'") . "', start: new Date(" . $start . ") };";
   
   $script .= file_get_contents( ECA_PLUGIN_DIR . '/lib/forms.js');
   

@@ -429,7 +429,7 @@ function eca_registration_prepare_graphql_mutation($event_id, $data, $created) {
         if(is_string($value)) {
             $value = str_replace("\n", ' ', $value);
 
-            $params_str .= $key . ': "' . $value . '", ';
+            $params_str .= $key . ': ' . json_encode($value, JSON_FORCE_OBJECT) . ', ';
             // $params_str .= $key . ': "string", ';
 
         }
