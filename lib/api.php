@@ -405,19 +405,21 @@ function eca_registration_prepare_graphql_mutation($event_id, $data, $created) {
     }
 
     
-    $known_extra_fields = array('agrees_freizeitleitung');
+    $known_extra_fields = array('agrees_freizeitleitung', 'seminar_vormittags', 'seminar_nachmittags');
 
 
-    $existing_known_extra_fields = array_filter($known_extra_fields, function($key) {
-        return isset($data[$key]);
-    });
-
-    $extra_fields = array_map(function($key) {
-        return array($key => $data[$key]);
-    }, $existing_known_extra_fields);
+    $extra_fields = [];
+    
+    foreach($known_extra_fields as $f) {
+        if(isset($data[$f])) {
+            $extra_fields[$f] = $data[$f];
+        }
+    }
 
     if(!empty($extra_fields)) {
-        $param['extra_json'] = json_decode($extra_fields);
+        $params['extra_json'] = str_replace('"', addslashes('\"'),
+            json_encode($extra_fields, JSON_FORCE_OBJECT)
+        );
     }
 
 
