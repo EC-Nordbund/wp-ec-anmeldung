@@ -155,7 +155,7 @@ function eca_registration_send_to_server($token, $event_id, $data, $created, $de
     $valid = eca_check_required_fields($api_event_id, $data);
 
     if($debug) {
-        $api_event_id = 4200;
+        // $api_event_id = 4200;
         $valid = eca_check_required_fields($api_event_id, $data);
     }
 
@@ -465,7 +465,7 @@ function eca_check_required_fields($event_id, $date) {
     // event id positiv 
     if(!is_integer($event_id) || $event_id < 0) {
         $state = false;
-        $value = 'event_id no positive integer: '.$event_id;
+        $value = 'event_id no (positive) integer: '.json_encode($event_id);
     }
 
     $required =array(
@@ -491,75 +491,46 @@ function eca_check_required_fields($event_id, $date) {
 function eca_event_id_mapping($wp_event_id) {
     $api_event_id = -1;
 
-    switch ($wp_event_id) {
+    $event_mapping_a = array(
+        // 2019
 
-        case 61:
-            $api_event_id = 400; // MAWE
-            break;
+        '61' => 400,    // MAWE
+        '62' => 401,    // ECK1
+        '63' => 402,    // ECK2
+        '64' => 403,    // MaTa
+        '65' => 404,    // JLC
+        '66' => 405,    // TO
+        '67' => 406,    // BC
+        '68' => 407,    // PC
+        '69' => 408,    // LJF1
+        '70' => 409,    // LJF2
+        '71' => 410,    // TC
+        '72' => 411,    // JuFr
+        '73' => 412,    // JEF
+        '74' => 413,    // AF
+        '75' => 414,    // RF
+        '76' => 415,    // TO
 
-        case 62:
-            $api_event_id = 401; // ECK1
-            break;
+        // 2020
 
-        case 63:
-            $api_event_id = 402; // ECK2
-            break;
+        '87' => 416,    // EC'ler auf der Kanzel
+        '88' => 417,    // MaWoe
+        '89' => 418,    // BibleCamp
+        '90' => 419,    // PfingsCamp
+        '91' => 420,    // TeenCamp
+        '92' => 421,    // LJF I
+        '93' => 422,    // LJF II
+        '94' => 423,    // LJF III
+        '96' => 424,    // Juleica
+        '97' => 425,    // Abendteuerfreizeit
+        '98' => 426,    // Reiterfreizeit
+        '99' => 427,    // MaTag
+        '100' => 428,   // TimeOut
+    );
 
-        case 64:
-            $api_event_id = 403; // MaTa
-            break;
-
-        case 65:
-            $api_event_id = 404; // JLC
-            break;
-
-        case 66:
-            $api_event_id = 405; // TO
-            break;
-
-        case 67:
-            $api_event_id = 406; // BC
-            break;
-
-        case 68:
-            $api_event_id = 407; // PC
-            break;
-
-        case 69:
-            $api_event_id = 408; // LJF1
-            break;
-
-        case 70:
-            $api_event_id = 409; // LJF2
-            break;
-
-        case 71:
-            $api_event_id = 410; // TC
-            break;
-
-        case 72:
-            $api_event_id = 411; // JuFr
-            break;
-
-        case 73:
-            $api_event_id = 412; // JEF
-            break;
-
-        case 74:
-            $api_event_id = 413; // AF
-            break;
-
-        case 75:
-            $api_event_id = 414; // RF
-            break;
-
-        case 76:
-            $api_event_id = 415;  // TO
-            break;
-
-        default:
-            break;
-    }
+    if( isset($event_mapping_a[$wp_event_id]) ) {
+        $api_event_id = $event_mapping_a[$wp_event_id];
+    } 
 
     return $api_event_id;
 }
