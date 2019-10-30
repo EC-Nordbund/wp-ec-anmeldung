@@ -70,9 +70,6 @@ export default class Countdown extends Vue {
             this.diff = 0;
 
             clearInterval(interval);
-
-            
-            window.location.reload();
         }
     }
 
@@ -103,7 +100,7 @@ export default class Countdown extends Vue {
 
     .ec-countdown {
         text-align: center;
-        padding: 1em;
+        padding: 0;
         margin: 0;
         min-width: 320px;
     }

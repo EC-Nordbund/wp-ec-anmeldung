@@ -1,24 +1,34 @@
 <template>
-    <v-app>
+    <v-app :style="{background: countdown ? '#eee' : 'transparent'}">
         <v-content>
             <v-container align-baseline justify-center>
-                <v-card flat full-width>
+                <v-card flat full-width color="white">
 
                 <v-card-text v-if="countdown" transition="scale-transition">
-                    <v-alert
-                        :value="countdown"
-                        type="info"
-                        >
-                        Anmeldung erst nach Ablauf des Countdowns möglich!
-                        </v-alert>
-                </v-card-text>
+                    <v-card-title primary-title>
+                        <v-spacer/>
+                            <span class="title text-xs-center text-sm-center text-md-center">
+                                Anmeldung in
+                            </span>
+                        <v-spacer/>
+                    </v-card-title>
 
-                <ec-countdown v-if="countdown" :until="event.start"/>
+                    <ec-countdown v-if="countdown" :until="event.start"/>
+
+                    <v-card-title >
+                        <v-spacer/>
+                            <span class="title text-xs-center text-sm-center text-md-center">
+                                möglich
+                            </span>
+                        <v-spacer/>
+                    </v-card-title>
+
+                </v-card-text>
         
                 <v-card-actions>
                     <v-spacer/>
-                    <v-dialog content-class="wp-overlay" v-model="dialog" fullscreen :disabled="countdown">
-                        <v-btn slot="activator" :disabled="countdown" color="primary">Anmelden</v-btn>
+                    <v-dialog content-class="wp-overlay" v-model="dialog" fullscreen full-width :disabled="countdown">
+                        <v-btn slot="activator" :disabled="countdown" block round large color="primary">Anmelden</v-btn>
 
                         <v-card flat>      
 
@@ -117,6 +127,12 @@ export default class Dialog extends Vue {
 
     .application--wrap {
         min-height: unset;
+    }
+
+    @media only screen and (max-width: 600px) {
+        .v-dialog__container {
+            width: 100%;
+        }
     }
 </style>
 
