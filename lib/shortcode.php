@@ -67,7 +67,7 @@ function eca_anmeldung_shortcode($atts) {
       .v-date-picker-table { height: unset !important; } </style>';
 
     $html .= '<div class="anmelde-wrapper">';
-      $html .= '<div id="anmeldung">';
+      $html .= '<div id="anmeldung">' . eca_alert_browser_compatibility();
       $html .= "</div>";
     $html .= '</div>';
 
@@ -79,21 +79,39 @@ function eca_anmeldung_shortcode($atts) {
       $html .= eca_initialisation_script($event_id, $event['event_name'], $form_id);
     }
 
-    $html .= eca_alert_browser_compatibility();
-
     return $html;
 }
 
 function eca_alert_browser_compatibility() {
-  $alert = '<style>.alert { padding: 20px; background-color: #467A2A; color: white; }';
-  $alert .= '.closebtn { margin-left: 15px; color: white; font-weight: bold; float: right; font-size: 22px; line-height: 20px; cursor: pointer; transition: 0.3s; }';
-  $alert .= '.closebtn:hover { color: black; opacity: 0.5; }</style>';
+  $alert = '<style>.alert{padding:20px;background-color:#18471e;color:white;}.alert h3{color:white;}';
+  $alert .= '.alert ul {list-style-type: none;padding: 16px 12px;margin: 0;} .alert ul li {
+    display: inline-block;
+    margin-right: 16px;
+  }
+  .alert .button {
+    background-color: #f5f5f5;
+    color: #18471e;
+    border: none;
+    color: black;
+    padding: 6px 18px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 6px 0;
+    cursor: pointer;
+    border-radius: 24px;
+    font-weight: 800;
+  } .alert .button:hover { background-color: #eaeaea; }</style>';
 
-  $alert .= '<br/><div class="alert">';
-  $alert .= '<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span>';
-  $alert .= '<strong>Hinweis zur Kompatibilität:</strong>';
-  $alert .= '<br/>Falls du auf dieser Seite keinen Anmelde-Button entdecken kannst, ist es von dem verwendeten Browser zur Zeit nicht möglich sich anzumelden.';
-  $alert .= '<br/>Bitte weiche auf einen anderen Browser aus. Wir empfehlen Firefox oder Google Chrome.</div>';
+  $alert .= '<div class="alert">';
+  $alert .= '<h3>Keine Anmeldung mit diesem Browser möglich</h3><hr style="color:white;width:42px;margin:8px 0;border-bottom:3px solid white;">';
+  $alert .= 'Dein Browser wird von unserm Anmeldesystem nicht unterstützt.<br>Eine Liste mit kompatiblen Browsern findest du hier:<br>';
+  $alert .= '<ul><li>Firefox ✓</li><li>Chrome ✓</li><li>Edge ✓</li><li>Opera ✓</li><li>Safari 10+ ✓</li></ul>';
+  $alert .= '<br>Hilf uns unser System zu verbessern und sende uns mit einem Klick auf den Button Informationen zu deinem Browser.';
+  $alert .= '<span style="width:100%;text-align:center;display:inline-block;"><a id="sendUserAgent" href="#" class="button" target="_top">Benachrichtige die Entwickler</a></span></div>';
+
+  $alert .= '<script>document.getElementById("sendUserAgent").setAttribute("href", "mailto:webmaster@ec-nordbund.de?subject=Browser-Kompatiblitäts-Report&body=" + encodeURI(window.navigator.userAgent) );</script>';
+
 
   return $alert;
 }
