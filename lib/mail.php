@@ -201,11 +201,16 @@ function eca_mail_generate_data_overview($data, $schema) {
 
     foreach ($schema as $step => $fields) {
         
-        $no_data = array_map(function ($f) {
-            return empty($data[$f['name']]);
-        }, $fields);
+        $no_data = array();
+        foreach($fields as $f) {
+            $no_data[] = empty($data[$f['name']]);
+        }
+        
+        // $table .= json_encode($fields, JSON_PRETTY_PRINT);
+        // $table .= json_encode($no_data, JSON_PRETTY_PRINT);
+        
 
-        if(in_array(true, $no_data)) { 
+        if(in_array(false, $no_data)) { 
 
             $th = $td = '';
 
