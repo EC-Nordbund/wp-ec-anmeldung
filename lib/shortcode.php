@@ -11,14 +11,38 @@ function eca_anmeldung_shortcode($atts) {
         array(
             'form_id' => 0,
             'event_id' => -1,
-            'start' => ''
+            'available_from_year' => 0,
+            'available_from_month' => 0,
+            'available_from_day' => 0,
+            'available_from_hour' => 0,
+            'available_from_min' => 0,
+            'difference_to_utc' => 1
         ),
         $atts
     );
 
     $form_id = $attributes['form_id'];
     $event_id = $attributes['event_id'];
-    $start = $attributes['start'];
+    $start_a = array(
+      intval( $attributes['available_from_year'] ),
+      intval( $attributes['available_from_month'] )-1,
+      intval( $attributes['available_from_day'] ),
+      intval( $attributes['available_from_hour'] ),
+      intval( $attributes['available_from_min'] ),
+    );
+
+    $utc_hours = intval( $attributes['difference_to_utc'] );
+
+    $start = '';
+
+    if(  ( $start_a[0] >  0                    )  // year: positive int
+      && ( $start_a[1] >= 0 && $start[1] <= 11 )  // month: between 0 and 11 (javascript)
+      && ( $start_a[2] >  0 && $start[2] <= 31 )  // day: between 1 and 31
+      && ( $start_a[3] >= 0 && $start[3] <= 23 )  // hour: between 0 and 23
+      && ( $start_a[4] >= 0 && $start[4] <= 59 )  // min: between 0 and 59
+    ) {
+      $start = 'Date.UTC(' . implode( ', ', $start_a ) . ', 0, 0)';
+    }
 
     // Don't show anything when no form is specified.
     // Used when there is an event which doesn't need a registration form.
@@ -36,6 +60,8 @@ function eca_anmeldung_shortcode($atts) {
     $html .= "<strong>We're sorry but vue-ec-anmeldung doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>";
     $html .= "</noscript>";
 
+    // $html .= "<pre>" . json_encode($start_a, JSON_PRETTY_PRINT) . "</pre>";
+
     $html .= '<style> .application--wrap { min-height: unset !important; } 
       .v-input--selection-controls { margin-top: unset !important; }
       .v-date-picker-table { height: unset !important; } </style>';
@@ -48,7 +74,7 @@ function eca_anmeldung_shortcode($atts) {
     $html .= eca_add_script_tags();
 
     if(!empty($start)) {
-      $html .= eca_initialisation_script($event_id, $event['event_name'], $form_id, $start);
+      $html .= eca_initialisation_script($event_id, $event['event_name'], $form_id, $start, $utc_hours);
     } else {
       $html .= eca_initialisation_script($event_id, $event['event_name'], $form_id);
     }
@@ -106,13 +132,19 @@ function eca_get_filename($path) {
     return end($array);
 }
 
-function eca_initialisation_script($event_id = -1, $event_name = '', $form_id = 0, $start = ANMELDE_START) {
+function eca_initialisation_script($event_id = -1, $event_name = '', $form_id = 0, $start = ANMELDE_START, $utc_hours = 1) {
 
   // TODO: alters beschränkung
 
-  $script = "<script> const init_event = {
+  $script = "<script>
+  Date.prototype.addHours= function(h){
+    this.setHours(this.getHours()+h);
+    return this;
+  }
+  
+  const init_event = {
     id: " . $event_id . ",
-    title: '" . addcslashes($event_name, "'") . "', start: new Date(" . $start . ") };";
+    title: '" . addcslashes($event_name, "'") . "', start: new Date(" . $start . ").addHours(" . - $utc_hours . ") };";
   
   $script .= file_get_contents( ECA_PLUGIN_DIR . '/lib/forms.js');
   
