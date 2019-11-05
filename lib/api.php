@@ -521,6 +521,7 @@ function eca_event_id_mapping($wp_event_id) {
         '92' => 421,    // LJF I
         '93' => 422,    // LJF II
         '94' => 423,    // LJF III
+        '95' => 429,    // JuFr
         '96' => 424,    // Juleica
         '97' => 425,    // Abendteuerfreizeit
         '98' => 426,    // Reiterfreizeit
