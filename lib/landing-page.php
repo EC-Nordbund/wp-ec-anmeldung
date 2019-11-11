@@ -130,7 +130,7 @@ class ECA_LandingPage {
                 break;
             
             case 'person_already_registered':
-                $title = 'Du bist breits angemeldet';
+                $title = 'Du bist bereits angemeldet';
                 $body .= '<p>Du wirst rechtzeitig von uns Post bekommen, in der alle weiteren für dich relevanten Information stehen.</p>';
                 break;
             
