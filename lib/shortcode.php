@@ -106,7 +106,7 @@ function eca_alert_browser_compatibility() {
   $alert .= '<div class="alert">';
   $alert .= '<h3>Keine Anmeldung mit diesem Browser möglich</h3><hr style="color:white;width:42px;margin:8px 0;border-bottom:3px solid white;">';
   $alert .= 'Dein Browser wird von unserm Anmeldesystem nicht unterstützt.<br>Eine Liste mit kompatiblen Browsern findest du hier:<br>';
-  $alert .= '<ul><li>Firefox ✓</li><li>Chrome ✓</li><li>Edge ✓</li><li>Opera ✓</li><li>Safari 10+ ✓</li></ul>';
+  $alert .= '<ul><li>Firefox ✓</li><li>Chrome ✓</li><li>Edge ✓</li><li>Opera ✓</li><li>Safari 10+ ✓</li><li>Internet Explorer ✗</li></ul>';
   $alert .= '<br>Hilf uns unser System zu verbessern und sende uns mit einem Klick auf den Button Informationen zu deinem Browser.';
   $alert .= '<span style="width:100%;text-align:center;display:inline-block;"><a id="sendUserAgent" href="#" class="button" target="_top">Benachrichtige die Entwickler</a></span></div>';
 
