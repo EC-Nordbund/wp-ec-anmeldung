@@ -255,7 +255,8 @@ function start() {
           {
             name: 'agrees_teilnehmer_bedingung',
             required: true, 
-            label: 'Ich erkenne die Teilnahmebedingungen für Freizeiten an und melde mich hiermit verbindlich an. (ggf. Einverständnis des Erziehungsberechtigten)',
+            label: 'Ich erkenne die <a href="https://www.ec-nordbund.de/downloads/teilnahmebedingungen/" alt="Teilnahmebedingungen" title="Teilnahmebedingungen" target="_blank"><strong>Teilnahmebedingungen</strong></a> für Freizeiten an und melde mich hiermit verbindlich an. (ggf. Einverständnis des Erziehungsberechtigten)',
+            label2Html: true,
             type: 'boolean',
             rules: [
               (v) => v?true:'Diese Zustimmung ist erforderlich',
@@ -265,7 +266,8 @@ function start() {
           {
             name: 'agrees_datenschutz',
             required: true,
-            label: 'Ich bin damit Einverstanden, dass meine eingegeben Daten für 24 Stunden zwischengespeichert werden und mir einem E-Mail zu bestätigen der Anmeldung zugeschickt wird.',
+            label: 'Ich nehme zur Kenntnis, dass meine eingegebenen Daten vorerst für <strong>24 Stunden</strong> zwischengespeichert werden und mir eine <strong>E-Mail zur Bestätigung und Vervollständigung meiner Anmeldung</strong> zugeschickt wird.',
+            label2Html: true,
             type: 'boolean',
             rules: [
               (v) => v?true:'Diese Zustimmung ist erforderlich',

@@ -1,3 +1,12 @@
+<template>
+  <v-checkbox v-bind="$attrs" v-on="$listeners">
+    <template v-if="$attrs.label2Html" slot="label">
+      <div v-html="$attrs.label"></div>
+    </template>
+  </v-checkbox>
+</template>
+
+<script lang="ts">
 import { CreateElement } from 'vue'
 import { Component, Vue, Prop, Watch, Emit } from 'vue-property-decorator'
 
@@ -18,6 +27,17 @@ export default class ecCheckbox extends Vue {
   })
   public value!: boolean;
 
+  @Prop({
+    type: String,
+    default: ''
+  })
+  public label!: string
+
+  @Prop({
+    type: Boolean,
+    default: false
+  })
+  public label2Html!: boolean
 
   private intern_value: boolean = false;
 
@@ -27,23 +47,8 @@ export default class ecCheckbox extends Vue {
     this.intern_value = value;
   }
 
-
   @Watch('intern_value')
   @Emit('input')
   public onInternValueChange(value: boolean) {}
-
-
-  public render(h: CreateElement) {
-    return h('v-checkbox', {
-      props: {
-        ...this.$attrs,
-        value: this.intern_value,
-      },
-      on: {
-        change: (val: boolean) => {
-          this.intern_value = val;
-        },
-      },
-    });
-  }
 }
+</script>

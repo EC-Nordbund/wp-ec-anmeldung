@@ -60,7 +60,7 @@ import radio from '@/components/radio'
 import datePicker from '@/components/date.vue'
 import schwimmen from "@/components/schwimmen.vue";
 import label from "@/components/label.vue";
-import checkbox from "@/components/checkbox";
+import checkbox from "@/components/checkbox.vue";
 import Countdown from './Countdown.vue';
 
 
