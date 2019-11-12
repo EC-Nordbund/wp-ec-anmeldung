@@ -27,8 +27,14 @@
                     />
                   </v-form>
 
-                  <v-alert :value="success && currentStep >= form.steps.length" type="success">Daten wurden erfolgreich übermittelt!</v-alert>
-                  <v-alert :value="error && currentStep >= form.steps.length" type="error">Fehler bei der übermittling deiner Daten. Versuche es später noch einmal</v-alert>
+                  <v-alert :value="success && currentStep >= form.steps.length" type="success">
+                    <span class="title">Fast geschafft!</span><br>
+                    Deine Daten wurden übermittelt, jetzt musst du sie nur noch bestätigen. Dazu haben wir dir eine E-Mail geschickt.
+                  </v-alert>
+
+                  <v-alert :value="error && currentStep >= form.steps.length" type="error">
+                    Fehler bei der übermittling deiner Daten. Versuche es später noch einmal.
+                  </v-alert>
 
                 </v-card-text>
 
