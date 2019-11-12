@@ -1,5 +1,5 @@
 <template>
-  <v-checkbox v-bind="$attrs" v-on="$listeners">
+  <v-checkbox v-bind="$attrs" v-on="$listeners" :class="{'mt-2': directAfterLabel}">
     <template v-if="$attrs.label2Html" slot="label">
       <div v-html="$attrs.label"></div>
     </template>
@@ -38,6 +38,12 @@ export default class ecCheckbox extends Vue {
     default: false
   })
   public label2Html!: boolean
+
+  @Prop({
+    type: Boolean,
+    default: false
+  })
+  public directAfterLabel!: boolean
 
   private intern_value: boolean = false;
 

@@ -282,6 +282,7 @@ function start() {
           },
           {
             name: 'agrees_fahrgemeinschaften',
+            directAfterLabel: true,
             label: 'Ich erkläre mich bereit meine Anschrift zum Zweck der Bildung von Fahrgemeinschaften an die anderen Teilnehmer weitergegeben werden dürfen.',
             type: 'boolean',
             component: 'ec-checkbox',
