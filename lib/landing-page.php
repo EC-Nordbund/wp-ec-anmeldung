@@ -21,7 +21,6 @@ class ECA_LandingPage {
             $fetch_states = array(
                 'waiting_for_confirmation',
                 'delayed_expiration',
-                'waitingqueue',
                 'authentication_failed',
                 'debug'
             );
