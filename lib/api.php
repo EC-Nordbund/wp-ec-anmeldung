@@ -527,6 +527,8 @@ function eca_event_id_mapping($wp_event_id) {
         '98' => 426,    // Reiterfreizeit
         '99' => 427,    // MaTag
         '100' => 428,   // TimeOut
+        '109' => 430,    // KKK I
+        '110' => 431,    // KKK II
     );
 
     if( isset($event_mapping_a[$wp_event_id]) ) {
