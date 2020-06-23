@@ -15,7 +15,7 @@
                 </li>
                 <li>
                     <p class="digit">{{ seconds | twoDigits }}</p>
-                    <p class="text">{{ seconds > 1 ? 'Seknden' : 'Sekunde' }}</p>
+                    <p class="text">{{ seconds > 1 ? 'Sekunden' : 'Sekunde' }}</p>
                 </li>
             </ul>
             
